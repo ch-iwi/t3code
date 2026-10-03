@@ -117,6 +117,13 @@ describe("AddProviderInstanceDialog environment routing", () => {
       },
     });
     let tree = render();
+    // fork(ch-iwi): Codex is not the default under the DV³ allowlist; pick it explicitly.
+    const group = visitElements(
+      tree,
+      (element) => element.props["aria-labelledby"] === "add-instance-driver-label",
+    );
+    (group!.props.onValueChange as (value: string) => void)("codex");
+    tree = render();
     // Codex offers ChatGPT sign-in first; manual setup keeps the existing CLI flow.
     (findByChildren(tree, "Configure manually").props.onClick as () => void)();
     tree = render();

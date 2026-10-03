@@ -20,6 +20,7 @@ import {
   ProviderDriverKind,
   ThreadId,
 } from "@t3tools/contracts";
+import { isProviderDriverAllowed } from "@t3tools/contracts"; // fork(ch-iwi)
 import * as Schema from "effect/Schema";
 import {
   ArrowRightIcon,
@@ -704,7 +705,10 @@ function ConnectedAgentsStep({
 
   const byDriver = useMemo(() => selectOnboardingProvidersByDriver(providers), [providers]);
 
-  const primaryAgents = PRIMARY_AGENT_DRIVERS.flatMap((driver) => {
+  // fork(ch-iwi): only agents the DV³ allowlist permits.
+  const primaryAgents = PRIMARY_AGENT_DRIVERS.filter((driver) =>
+    isProviderDriverAllowed(driver),
+  ).flatMap((driver) => {
     const instances =
       driver === "codex" ? providers?.filter((provider) => provider.driver === driver) : undefined;
     return instances?.length

@@ -79,6 +79,11 @@ import * as AgentAwarenessRelay from "./relay/AgentAwarenessRelay.ts";
 import { hasCloudPublicConfig } from "./cloud/publicConfig.ts";
 import { ProviderRegistryLive } from "./provider/Layers/ProviderRegistry.ts";
 import * as ServerSettings from "./serverSettings.ts";
+import {
+  withDv3AcpRegistryPolicy,
+  withDv3ProviderInstancePolicy,
+  withDv3SettingsPolicy,
+} from "./dv3ProviderPolicy.ts"; // fork(ch-iwi)
 import * as ProjectEnrichmentService from "./project/ProjectEnrichmentService.ts";
 import * as NativeAppIconResolver from "./assets/NativeAppIconResolver.ts";
 import * as AntigravityInstallation from "./provider/AntigravityInstallation.ts";
@@ -194,7 +199,8 @@ const ApplicationObservabilityLive = EventLoopMonitor.layer.pipe(
 
 const PtyAdapterLive = NodePtyAdapter.layer;
 
-const ServerSettingsLayerLive = ServerSettings.layer.pipe(
+// fork(ch-iwi): DV³ provider allowlist wraps settings, the instance registry, and the ACP catalog.
+const ServerSettingsLayerLive = withDv3SettingsPolicy(ServerSettings.layer).pipe(
   Layer.provide(ServerSecretStore.layer),
   Layer.provideMerge(SqlitePersistence.layerConfig),
 );
@@ -560,7 +566,7 @@ const RuntimeCoreDependenciesBaseLive = Layer.mergeAll(
   // through this layer. Built-in drivers come from `BUILT_IN_DRIVERS`;
   // `providerInstances` hydration merges `settings.providers.<kind>`
   // with explicit `providerInstances` entries on boot.
-  Layer.provideMerge(ProviderInstanceRegistryHydrationLive),
+  Layer.provideMerge(withDv3ProviderInstancePolicy(ProviderInstanceRegistryHydrationLive)),
   Layer.provideMerge(
     Layer.mergeAll(
       AntigravityInstallation.AntigravityInstallation.layer,
@@ -573,7 +579,7 @@ const RuntimeCoreDependenciesLive = RuntimeCoreDependenciesBaseLive.pipe(
   Layer.provideMerge(PtyAdapterLive),
   // Search, prepare, status inspection, and turn launch share one registry
   // cache so every client and provider instance sees the same prepared agents.
-  Layer.provideMerge(AcpRegistryCatalogLive),
+  Layer.provideMerge(withDv3AcpRegistryPolicy(AcpRegistryCatalogLive)),
   // Shared native/canonical NDJSON writers used by both the per-instance
   // V2 drivers and the orchestration runtime. Provide resource attribution so
   // the rewritten telemetry pipeline can account for logical NDJSON writes.

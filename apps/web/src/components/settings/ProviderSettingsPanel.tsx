@@ -18,6 +18,7 @@ import {
   resolveEnvironmentMachineKind,
   resolveProviderInstanceEnabled,
 } from "@t3tools/contracts";
+import { isProviderDriverAllowed } from "@t3tools/contracts"; // fork(ch-iwi)
 import { DEFAULT_UNIFIED_SETTINGS } from "@t3tools/contracts/settings";
 import {
   getBackgroundActivityPresetSettings,
@@ -673,12 +674,13 @@ export function EnvironmentProviderSettings({
       ),
     [serverProviders],
   );
+  // fork(ch-iwi): drivers outside the DV³ allowlist, like Cursor, show only when the server reports them.
   const visibleProviderSettings = PROVIDER_SETTINGS.filter(
     (providerSettings) =>
-      providerSettings.provider !== "cursor" ||
+      (providerSettings.provider !== "cursor" &&
+        isProviderDriverAllowed(providerSettings.provider)) ||
       serverProviders.some(
-        (provider) =>
-          provider.instanceId === defaultInstanceIdForDriver(ProviderDriverKind.make("cursor")),
+        (provider) => provider.instanceId === defaultInstanceIdForDriver(providerSettings.provider),
       ),
   );
   const textGenerationModelSelection = resolveAppModelSelectionState(settings, serverProviders);

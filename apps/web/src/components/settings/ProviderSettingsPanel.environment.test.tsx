@@ -218,6 +218,7 @@ describe("EnvironmentProviderSettings routing", () => {
   });
 
   it("shows Codex and Claude while hiding untouched disabled provider slots", () => {
+    atoms.providers = [provider()]; // fork(ch-iwi): Codex slots need a server that reports Codex.
     const panel = renderPanel();
     for (const driver of ["codex", "claudeAgent"] as const) {
       expect(
@@ -266,6 +267,14 @@ describe("EnvironmentProviderSettings routing", () => {
         },
       },
     };
+    // fork(ch-iwi): Grok slots need a server that reports Grok.
+    atoms.providers = [
+      {
+        ...provider(),
+        instanceId: ProviderInstanceId.make("grok"),
+        driver: ProviderDriverKind.make("grok"),
+      },
+    ];
     const panel = renderPanel();
     expect(
       visitElements(
@@ -436,6 +445,7 @@ describe("EnvironmentProviderSettings routing", () => {
       },
       favorites: [{ provider: customId, model: "favorite" }],
     };
+    atoms.providers = [provider()]; // fork(ch-iwi): Codex slots need a server that reports Codex.
     let panel = renderPanel();
     const customRow = visitElements(
       panel,
