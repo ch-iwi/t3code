@@ -743,7 +743,7 @@ it.layer(NodeServices.layer)("effect-acp client", (it) => {
     }),
   );
 
-  it.effect("uses distinct ids for RPC calls and extension requests", () =>
+  it.effect("uses distinct int32 ids for RPC calls and extension requests", () =>
     Effect.gen(function* () {
       const { stdio, input, output } = yield* makeInMemoryStdio();
       const scope = yield* Scope.make();
@@ -784,6 +784,13 @@ it.layer(NodeServices.layer)("effect-acp client", (it) => {
         : yield* decodedExt(firstOutbound);
 
       assert.notEqual(initializeRequest.id, extRequest.id);
+      // The Kotlin ACP SDK (used by Junie) drops requests whose id exceeds an Int.
+      for (const id of [initializeRequest.id, extRequest.id]) {
+        if (typeof id !== "number") assert.fail(`expected a numeric id, got string "${id}"`);
+        assert.isTrue(Number.isInteger(id), `id ${id} is not an integer`);
+        assert.isAbove(id, 0);
+        assert.isAtMost(id, 2 ** 31 - 1);
+      }
 
       yield* Queue.offer(
         input,
