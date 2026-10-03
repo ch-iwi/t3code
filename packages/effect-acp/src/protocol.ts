@@ -156,6 +156,14 @@ const encodeJsonRpcNotification = Schema.encodeUnknownExit(
   ),
 );
 
+/**
+ * First id for Effect RPC requests, which share the wire with extension
+ * requests counting up from 1. ACP allows int64 ids, but it stays within a
+ * signed 32-bit integer because the Kotlin ACP SDK (used by Junie) decodes ids
+ * as `Int` and silently drops requests with larger ids.
+ */
+export const FIRST_RPC_REQUEST_ID = 2 ** 30;
+
 const isEffectRpcRequestId = (requestId: AcpError.AcpRequestId): boolean =>
   typeof requestId === "number" && Number.isSafeInteger(requestId);
 
