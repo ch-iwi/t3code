@@ -96,7 +96,7 @@ describe("DesktopEarlyElectronStartup", () => {
       homeDirectory: "/home/user",
       joinPath,
       readFileString: (path) => {
-        assert.equal(path, "/home/user/.t3/dev/desktop-settings.json");
+        assert.equal(path, "/home/user/.dv3/dev/desktop-settings.json");
         return JSON.stringify({ linuxPasswordStore: "kwallet" });
       },
     });
@@ -113,7 +113,7 @@ describe("DesktopEarlyElectronStartup", () => {
       homeDirectory: "/home/user",
       joinPath,
       readFileString: (path) => {
-        assert.equal(path, "/home/user/.t3/dev/desktop-settings.json");
+        assert.equal(path, "/home/user/.dv3/dev/desktop-settings.json");
         return JSON.stringify({ linuxPasswordStore: "gnome-libsecret" });
       },
     });

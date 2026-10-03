@@ -6,6 +6,8 @@ import * as Scope from "effect/Scope";
 
 import * as Electron from "electron";
 
+import { toHeaderSafeUserAgent } from "./headerSafeUserAgent.ts";
+
 export interface ElectronAppMetadata {
   readonly appVersion: string;
   readonly appPath: string;
@@ -155,6 +157,8 @@ export const make = ElectronApp.of({
   setName: (name) =>
     Effect.sync(() => {
       Electron.app.setName(name);
+      // fork(ch-iwi): Electron derives the User-Agent from the name; keep it header-safe.
+      Electron.app.userAgentFallback = toHeaderSafeUserAgent(Electron.app.userAgentFallback);
     }),
   setAboutPanelOptions: (options) =>
     Effect.sync(() => {

@@ -61,16 +61,17 @@ const resolveResourcePath = Effect.fn("desktop.assets.resolveResourcePath")(func
   return Option.none<string>();
 });
 
+// fork(ch-iwi): DV³ Code icons in assets/dv3, rendered by scripts/export-dv3-icons.ts.
 const sourceTreeIconFileNames = {
   dev: {
-    ico: "blueprint-windows.ico",
-    macPng: "blueprint-macos-1024.png",
-    universalPng: "blueprint-universal-1024.png",
+    ico: "dv3-dev-windows.ico",
+    macPng: "dv3-dev-macos-1024.png",
+    universalPng: "dv3-dev-universal-1024.png",
   },
   prod: {
-    ico: "t3-black-windows.ico",
-    macPng: "black-macos-1024.png",
-    universalPng: "black-universal-1024.png",
+    ico: "dv3-windows.ico",
+    macPng: "dv3-macos-1024.png",
+    universalPng: "dv3-universal-1024.png",
   },
 } as const;
 
@@ -87,7 +88,7 @@ function resolveSourceTreeIconPath(
       : environment.platform === "darwin"
         ? fileNames.macPng
         : fileNames.universalPng;
-  return environment.path.join(environment.rootDir, "assets", brand, fileName);
+  return environment.path.join(environment.rootDir, "assets", "dv3", fileName);
 }
 
 const resolveIconPath = Effect.fn("desktop.assets.resolveIconPath")(function* (

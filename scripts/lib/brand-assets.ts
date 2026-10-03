@@ -57,24 +57,25 @@ const WEB_ICON_TARGET_FILENAMES = {
   appleTouchIconPng: "apple-touch-icon.png",
 } as const;
 
+// fork(ch-iwi): DV³ Code icons, rendered by scripts/export-dv3-icons.ts.
 const WEB_ICON_SOURCE_PATHS_BY_BRAND = {
   development: {
-    faviconIco: BRAND_ASSET_PATHS.developmentWebFaviconIco,
-    favicon16Png: BRAND_ASSET_PATHS.developmentWebFavicon16Png,
-    favicon32Png: BRAND_ASSET_PATHS.developmentWebFavicon32Png,
-    appleTouchIconPng: BRAND_ASSET_PATHS.developmentWebAppleTouchIconPng,
+    faviconIco: "assets/dv3/dv3-dev-web-favicon.ico",
+    favicon16Png: "assets/dv3/dv3-dev-web-favicon-16x16.png",
+    favicon32Png: "assets/dv3/dv3-dev-web-favicon-32x32.png",
+    appleTouchIconPng: "assets/dv3/dv3-dev-web-apple-touch-180.png",
   },
   nightly: {
-    faviconIco: BRAND_ASSET_PATHS.nightlyWebFaviconIco,
-    favicon16Png: BRAND_ASSET_PATHS.nightlyWebFavicon16Png,
-    favicon32Png: BRAND_ASSET_PATHS.nightlyWebFavicon32Png,
-    appleTouchIconPng: BRAND_ASSET_PATHS.nightlyWebAppleTouchIconPng,
+    faviconIco: "assets/dv3/dv3-nightly-web-favicon.ico",
+    favicon16Png: "assets/dv3/dv3-nightly-web-favicon-16x16.png",
+    favicon32Png: "assets/dv3/dv3-nightly-web-favicon-32x32.png",
+    appleTouchIconPng: "assets/dv3/dv3-nightly-web-apple-touch-180.png",
   },
   production: {
-    faviconIco: BRAND_ASSET_PATHS.productionWebFaviconIco,
-    favicon16Png: BRAND_ASSET_PATHS.productionWebFavicon16Png,
-    favicon32Png: BRAND_ASSET_PATHS.productionWebFavicon32Png,
-    appleTouchIconPng: BRAND_ASSET_PATHS.productionWebAppleTouchIconPng,
+    faviconIco: "assets/dv3/dv3-web-favicon.ico",
+    favicon16Png: "assets/dv3/dv3-web-favicon-16x16.png",
+    favicon32Png: "assets/dv3/dv3-web-favicon-32x32.png",
+    appleTouchIconPng: "assets/dv3/dv3-web-apple-touch-180.png",
   },
 } as const satisfies Record<WebAssetBrand, Record<keyof typeof WEB_ICON_TARGET_FILENAMES, string>>;
 

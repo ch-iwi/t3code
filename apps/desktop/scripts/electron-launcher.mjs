@@ -15,19 +15,20 @@ const repoRoot = NodePath.resolve(desktopDir, "..", "..");
 const devBundleIdSuffix = NodePath.basename(repoRoot)
   .toLowerCase()
   .replaceAll(/[^a-z0-9]+/g, "");
-const APP_DISPLAY_NAME = isDevelopment ? "T3 Code (Dev)" : "T3 Code (Alpha)";
+const APP_DISPLAY_NAME = isDevelopment ? "DV³ Code (Dev)" : "DV³ Code (Alpha)";
 const APP_BUNDLE_ID = isDevelopment
   ? `com.t3tools.t3code.dev.${devBundleIdSuffix || "local"}`
   : "com.t3tools.t3code";
 const APP_PROTOCOL_SCHEMES = isDevelopment ? ["t3code-dev"] : ["t3code"];
 const LAUNCHER_VERSION = 19;
+// fork(ch-iwi): DV³ Code icons, rendered by scripts/export-dv3-icons.ts.
 const developmentMacIconPngPath = NodePath.join(
   repoRoot,
   "assets",
-  "dev",
-  "blueprint-macos-1024.png",
+  "dv3",
+  "dv3-dev-macos-1024.png",
 );
-const productionMacIconPngPath = NodePath.join(repoRoot, "assets", "prod", "black-macos-1024.png");
+const productionMacIconPngPath = NodePath.join(repoRoot, "assets", "dv3", "dv3-macos-1024.png");
 // oxlint-disable-next-line t3code/no-global-process-runtime -- Standalone launcher script has no Effect runtime.
 const hostPlatform = NodeOS.platform();
 

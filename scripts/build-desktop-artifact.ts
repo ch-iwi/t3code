@@ -23,11 +23,7 @@ import gnomeCaptureBundle from "../apps/desktop/gnome-extension/bundle.json" wit
 import serverPackageJson from "../apps/server/package.json" with { type: "json" };
 
 import { applyWebBrandAssets } from "./apply-web-brand-assets.ts";
-import {
-  BRAND_ASSET_PATHS,
-  resolveWebAssetBrandForChannel,
-  type WebAssetBrand,
-} from "./lib/brand-assets.ts";
+import { resolveWebAssetBrandForChannel, type WebAssetBrand } from "./lib/brand-assets.ts";
 import { getDefaultBuildArch } from "./lib/build-target-arch.ts";
 import {
   findInlinedExternalPackages,
@@ -54,7 +50,7 @@ import { Command, Flag } from "effect/unstable/cli";
 import { ChildProcess, ChildProcessSpawner } from "effect/unstable/process";
 
 const LINUX_ICON_SIZES = [16, 22, 24, 32, 48, 64, 128, 256, 512] as const;
-const DESKTOP_APP_ID = "com.t3tools.t3code";
+const DESKTOP_APP_ID = "ch.dvbern.dv3code";
 const APPLE_TEAM_ID_PATTERN = /^[A-Z0-9]{10}$/u;
 
 const BuildPlatform = Schema.Literals(["mac", "linux", "win"]);
@@ -2611,17 +2607,19 @@ export function resolveDesktopWebAssetBrand(version: string): WebAssetBrand {
 
 export function resolveDesktopBuildIconAssets(version: string): DesktopBuildIconAssets {
   if (resolveDesktopUpdateChannel(version) === "nightly") {
+    // fork(ch-iwi): DV³ Code icons, rendered by scripts/export-dv3-icons.ts.
     return {
-      macIconPng: BRAND_ASSET_PATHS.nightlyMacIconPng,
-      linuxIconPng: BRAND_ASSET_PATHS.nightlyLinuxIconPng,
-      windowsIconIco: BRAND_ASSET_PATHS.nightlyWindowsIconIco,
+      macIconPng: "assets/dv3/dv3-nightly-macos-1024.png",
+      linuxIconPng: "assets/dv3/dv3-nightly-universal-1024.png",
+      windowsIconIco: "assets/dv3/dv3-nightly-windows.ico",
     };
   }
 
+  // fork(ch-iwi): DV³ Code icons, rendered by scripts/export-dv3-icons.ts.
   return {
-    macIconPng: BRAND_ASSET_PATHS.productionMacIconPng,
-    linuxIconPng: BRAND_ASSET_PATHS.productionLinuxIconPng,
-    windowsIconIco: BRAND_ASSET_PATHS.productionWindowsIconIco,
+    macIconPng: "assets/dv3/dv3-macos-1024.png",
+    linuxIconPng: "assets/dv3/dv3-universal-1024.png",
+    windowsIconIco: "assets/dv3/dv3-windows.ico",
   };
 }
 
@@ -2670,7 +2668,8 @@ export const createBuildConfig = Effect.fn("createBuildConfig")(function* (
   const buildConfig: Record<string, unknown> = {
     appId: DESKTOP_APP_ID,
     productName: resolveDesktopProductName(version),
-    artifactName: "T3-Code-${version}-${arch}.${ext}",
+    // fork(ch-iwi): plain ASCII so the file name is safe in URLs and download tools.
+    artifactName: "DV3-Code-${version}-${arch}.${ext}",
     electronLanguages: [...DESKTOP_ELECTRON_LANGUAGES],
     files: [
       ...DESKTOP_FILE_EXCLUSIONS,
