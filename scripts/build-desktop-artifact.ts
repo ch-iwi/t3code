@@ -30,6 +30,8 @@ import {
   selectCliRuntimeExternalDependencies,
 } from "./lib/cli-external-packages.ts";
 import { loadRepoEnv } from "./lib/public-config.ts";
+// fork(ch-iwi): DV³ Code ships without T3 Connect.
+import { assertT3ConnectDisabled } from "./lib/dv3-t3-connect.ts";
 import { selectDesktopRuntimeExternalDependencies } from "./lib/desktop-external-packages.ts";
 import { resolveCatalogDependencies } from "./lib/resolve-catalog.ts";
 
@@ -3379,6 +3381,8 @@ const buildDesktopArtifact = Effect.fn("buildDesktopArtifact")(function* (
   options: ResolvedBuildOptions,
 ) {
   const repoRoot = yield* RepoRoot;
+  // fork(ch-iwi): DV³ Code ships without T3 Connect.
+  yield* assertT3ConnectDisabled(loadRepoEnv({ repoRoot }));
   const path = yield* Path.Path;
   const fs = yield* FileSystem.FileSystem;
   const hostPlatform = yield* HostProcessPlatform;
