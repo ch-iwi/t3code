@@ -9,16 +9,39 @@ One-time setup per clone:
 
 ```bash
 git remote add upstream https://github.com/pingdotgg/t3code.git
+git config remote.upstream.fetch '+refs/heads/main:refs/remotes/upstream/main'
 git config rerere.enabled true
 ```
 
-Sync by merging, not rebasing. Rebasing a published branch forces a force-push on every sync and breaks worktrees.
+Sync by merging on the command line, not rebasing and not with GitHub's "Sync fork" button. Rebasing a published branch forces a force-push on every sync and breaks worktrees. "Sync fork" runs no checks, cannot use `rerere`, and on a conflict offers to discard our commits, which would drop every DV³ customization from `main`.
 
-```bash
-git fetch upstream && git merge upstream/main
-```
+Run each step from the main checkout:
 
-`rerere` records each conflict resolution and replays it when the same conflict reappears in a later sync.
+1. Start from an up-to-date `main`:
+
+   ```bash
+   git checkout main && git pull --ff-only
+   ```
+
+2. Merge upstream. Resolve any conflicts against the customizations listed below; `rerere` replays resolutions it has seen before.
+
+   ```bash
+   git fetch upstream && git merge upstream/main
+   ```
+
+3. Reinstall dependencies and run the fork's own tests:
+
+   ```bash
+   vp i && vp test run apps/server/src/dv3ProviderPolicy.test.ts apps/web/src/components/settings apps/desktop/src/app scripts/build-desktop-artifact.test.ts
+   ```
+
+4. Check whether upstream added or moved anything a customization depends on. `git grep "fork(ch-iwi)"` and `git grep "DV³"` list every customized spot; the sections below say what each one must still do.
+5. If the desktop app ships from this sync, build it once (`vp run dist:desktop:dmg:arm64`) and launch it.
+6. Push:
+
+   ```bash
+   git push origin main
+   ```
 
 ## Writing merge-friendly changes
 
