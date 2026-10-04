@@ -80,6 +80,7 @@ import { hasCloudPublicConfig } from "./cloud/publicConfig.ts";
 import { ProviderRegistryLive } from "./provider/Layers/ProviderRegistry.ts";
 import * as ServerSettings from "./serverSettings.ts";
 import {
+  Dv3CodexInstallationDisabledLive,
   withDv3AcpRegistryPolicy,
   withDv3ProviderInstancePolicy,
   withDv3SettingsPolicy,
@@ -570,7 +571,7 @@ const RuntimeCoreDependenciesBaseLive = Layer.mergeAll(
   Layer.provideMerge(
     Layer.mergeAll(
       AntigravityInstallation.AntigravityInstallation.layer,
-      CodexInstallation.CodexInstallation.layer,
+      Dv3CodexInstallationDisabledLive, // fork(ch-iwi): Codex CLI is never looked up
     ),
   ),
 );

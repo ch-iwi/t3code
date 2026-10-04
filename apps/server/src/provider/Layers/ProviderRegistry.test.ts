@@ -2539,7 +2539,8 @@ it.layer(Layer.mergeAll(TestNodeServices, ServerSettingsModule.layerTest(), Test
       // breaks — the `codex_personal`-never-probes bug we are guarding
       // against — that snapshot never lands in `getProviders` and the
       // assertions below fail.
-      it.effect("propagates real Codex probe failures to the aggregator at boot", () =>
+      // fork(ch-iwi): DV³ Code does not build the Codex driver or the full built-in driver set.
+      it.effect.skip("propagates real Codex probe failures to the aggregator at boot", () =>
         Effect.gen(function* () {
           const missingBinary = `t3code_codex_missing_`;
           const serverSettings = yield* makeMutableServerSettingsService(
@@ -2654,7 +2655,8 @@ it.layer(Layer.mergeAll(TestNodeServices, ServerSettingsModule.layerTest(), Test
       );
 
       // A binary path change must rebuild Codex and publish its new probe result.
-      it.effect("re-probes when settings change the codex binaryPath", () =>
+      // fork(ch-iwi): DV³ Code does not build the Codex driver or the full built-in driver set.
+      it.effect.skip("re-probes when settings change the codex binaryPath", () =>
         Effect.gen(function* () {
           const firstMissing = `t3code_codex_first_`;
           const secondMissing = `t3code_codex_second_`;
@@ -2852,7 +2854,8 @@ it.layer(Layer.mergeAll(TestNodeServices, ServerSettingsModule.layerTest(), Test
         }),
       );
 
-      it.effect(
+      // fork(ch-iwi): DV³ Code does not build the Codex driver or the full built-in driver set.
+      it.effect.skip(
         "keeps Cursor disabled and skips provider probing when settings use their defaults",
         () =>
           Effect.gen(function* () {

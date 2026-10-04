@@ -10,6 +10,8 @@
 //     looked up, so no session, turn, or text generation can run on them.
 //   - ACP Registry catalog: only allowed agents can be searched, installed,
 //     inspected, or launched.
+// It also replaces the Codex installation service, since builtInDrivers.ts no
+// longer builds the Codex driver and nothing should look for the Codex CLI.
 import {
   ALLOWED_ACP_REGISTRY_AGENTS,
   DEFAULT_MODEL_BY_PROVIDER,
@@ -19,6 +21,7 @@ import {
   isProviderInstanceConfigAllowed,
   type AcpRegistrySearchAgent,
   type ModelSelection,
+  type ProviderInstallState,
   ProviderDriverKind,
   ProviderInstanceId,
   type ServerSettings,
@@ -26,9 +29,12 @@ import {
 } from "@t3tools/contracts";
 import * as Effect from "effect/Effect";
 import * as Layer from "effect/Layer";
+import * as Path from "effect/Path";
 import * as Stream from "effect/Stream";
 
+import { ServerConfig } from "./config.ts";
 import { AcpRegistryCatalog, AcpRegistryError } from "./provider/acp/AcpRegistrySupport.ts";
+import { CodexInstallation, CodexInstallationError } from "./provider/CodexInstallation.ts";
 import type { ProviderInstance } from "./provider/ProviderDriver.ts";
 import { ProviderInstanceRegistry } from "./provider/Services/ProviderInstanceRegistry.ts";
 import { ServerSettingsService } from "./serverSettings.ts";
@@ -200,3 +206,38 @@ export const withDv3AcpRegistryPolicy = <A, E, R>(
       }),
     ).pipe(Layer.provide(layer)),
   );
+
+/** Codex is outside the allowlist: this stand-in never looks for, installs, or runs the Codex CLI. */
+export const Dv3CodexInstallationDisabledLive = Layer.effect(
+  CodexInstallation,
+  Effect.gen(function* () {
+    const config = yield* ServerConfig;
+    const path = yield* Path.Path;
+    const idle: ProviderInstallState = {
+      driver: ProviderDriverKind.make("codex"),
+      operationId: null,
+      phase: "idle",
+      downloadedBytes: 0,
+      totalBytes: null,
+      version: null,
+      installedVersion: null,
+      executablePath: null,
+      canRemove: false,
+      message: null,
+    };
+    const blocked = (operation: string) =>
+      Effect.fail(
+        new CodexInstallationError({ operation, detail: "Codex is not allowed in DV³ Code." }),
+      );
+    return CodexInstallation.of({
+      managedDirectory: path.join(config.baseDir, "tools", "codex"),
+      resolve: () => blocked("resolve"),
+      acquire: () => blocked("acquire"),
+      start: blocked("start"),
+      cancel: () => blocked("cancel"),
+      state: Effect.succeed(idle),
+      changes: Stream.make(idle),
+      remove: () => blocked("remove"),
+    });
+  }),
+);

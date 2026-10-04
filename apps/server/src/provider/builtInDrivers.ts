@@ -29,6 +29,7 @@ import { GrokDriver, type GrokDriverEnv } from "./Drivers/GrokDriver.ts";
 import { OpenCodeDriver, type OpenCodeDriverEnv } from "./Drivers/OpenCodeDriver.ts";
 import { PiDriver, type PiDriverEnv } from "./Drivers/PiDriver.ts";
 import type { AnyProviderDriver } from "./ProviderDriver.ts";
+import { isProviderDriverAllowed } from "@t3tools/contracts"; // fork(ch-iwi)
 
 /**
  * Union of infrastructure services required to construct any built-in
@@ -59,4 +60,5 @@ export const BUILT_IN_DRIVERS: ReadonlyArray<AnyProviderDriver<BuiltInDriversEnv
   AntigravityDriver,
   PiDriver,
   AcpRegistryDriver,
-];
+  // fork(ch-iwi): drivers outside the DV³ allowlist are never constructed, so they run no checks.
+].filter((driver) => isProviderDriverAllowed(driver.driverKind));

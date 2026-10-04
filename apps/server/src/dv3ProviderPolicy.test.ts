@@ -12,7 +12,12 @@ import * as Layer from "effect/Layer";
 import * as PubSub from "effect/PubSub";
 import * as Stream from "effect/Stream";
 
+import * as NodeServices from "@effect/platform-node/NodeServices";
+
+import * as ServerConfig from "./config.ts";
+import { CodexInstallation, CodexInstallationError } from "./provider/CodexInstallation.ts";
 import {
+  Dv3CodexInstallationDisabledLive,
   applyDv3ProviderPolicy,
   withDv3AcpRegistryPolicy,
   withDv3ProviderInstancePolicy,
@@ -188,5 +193,24 @@ describe("withDv3AcpRegistryPolicy", () => {
       const error = yield* catalog.prepare({ agentId: "gemini" }).pipe(Effect.flip);
       assert.instanceOf(error, AcpRegistryError);
     }).pipe(Effect.provide(withDv3AcpRegistryPolicy(fakeCatalogLayer))),
+  );
+});
+
+describe("Dv3CodexInstallationDisabledLive", () => {
+  it.effect("reports Codex as not installed and refuses to resolve or install it", () =>
+    Effect.gen(function* () {
+      const installation = yield* CodexInstallation;
+
+      assert.strictEqual((yield* installation.state).installedVersion, null);
+      assert.instanceOf(yield* installation.resolve().pipe(Effect.flip), CodexInstallationError);
+      assert.instanceOf(yield* installation.start.pipe(Effect.flip), CodexInstallationError);
+    }).pipe(
+      Effect.provide(
+        Dv3CodexInstallationDisabledLive.pipe(
+          Layer.provide(ServerConfig.layerTest(process.cwd(), { prefix: "dv3-codex-" })),
+          Layer.provide(NodeServices.layer),
+        ),
+      ),
+    ),
   );
 });

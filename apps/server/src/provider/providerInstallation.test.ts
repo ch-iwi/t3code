@@ -144,7 +144,8 @@ describe("provider installation routing", () => {
     }).pipe(Effect.scoped, Effect.provide(NodeServices.layer)),
   );
 
-  it.effect("keeps external installs manual without hiding shared install status", () =>
+  // fork(ch-iwi): DV³ Code does not build the Codex driver or the full built-in driver set.
+  it.effect.skip("keeps external installs manual without hiding shared install status", () =>
     Effect.gen(function* () {
       const harness = yield* makeHarness({
         settings: { providers: { antigravity: { binaryPath: "/external/agy" } } },
@@ -159,20 +160,25 @@ describe("provider installation routing", () => {
     }).pipe(Effect.scoped, Effect.provide(NodeServices.layer)),
   );
 
-  it.effect("routes a managed Codex instance through its own installer and refreshes removal", () =>
-    Effect.gen(function* () {
-      const codexId = ProviderInstanceId.make("codex");
-      const harness = yield* makeHarness({
-        instance: instance(ProviderDriverKind.make("codex"), codexId),
-        settings: { providers: { codex: { setupMode: "managed" } } },
-      });
-      assert.equal((yield* harness.router.start({ instanceId: codexId })).driver, "codex");
-      yield* harness.router.cancel({ instanceId: codexId, operationId: "operation" });
-      const observed = yield* Stream.runCollect(harness.router.subscribe({ instanceId: codexId }));
-      assert.equal(Array.from(observed)[0]?.driver, "codex");
-      yield* harness.router.remove({ instanceId: codexId });
-      assert.deepEqual(harness.calls, ["codex-start", "codex-cancel", "codex-remove", "refresh"]);
-    }).pipe(Effect.scoped, Effect.provide(NodeServices.layer)),
+  // fork(ch-iwi): DV³ Code does not build the Codex driver or the full built-in driver set.
+  it.effect.skip(
+    "routes a managed Codex instance through its own installer and refreshes removal",
+    () =>
+      Effect.gen(function* () {
+        const codexId = ProviderInstanceId.make("codex");
+        const harness = yield* makeHarness({
+          instance: instance(ProviderDriverKind.make("codex"), codexId),
+          settings: { providers: { codex: { setupMode: "managed" } } },
+        });
+        assert.equal((yield* harness.router.start({ instanceId: codexId })).driver, "codex");
+        yield* harness.router.cancel({ instanceId: codexId, operationId: "operation" });
+        const observed = yield* Stream.runCollect(
+          harness.router.subscribe({ instanceId: codexId }),
+        );
+        assert.equal(Array.from(observed)[0]?.driver, "codex");
+        yield* harness.router.remove({ instanceId: codexId });
+        assert.deepEqual(harness.calls, ["codex-start", "codex-cancel", "codex-remove", "refresh"]);
+      }).pipe(Effect.scoped, Effect.provide(NodeServices.layer)),
   );
 
   it.effect("keeps native Codex installation outside managed setup", () =>

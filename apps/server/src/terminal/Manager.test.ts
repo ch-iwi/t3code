@@ -2269,7 +2269,8 @@ it.layer(
     ),
   );
 
-  it.effect("resolves the legacy Codex default instance", () =>
+  // fork(ch-iwi): DV³ Code does not build the Codex driver or the full built-in driver set.
+  it.effect.skip("resolves the legacy Codex default instance", () =>
     Effect.gen(function* () {
       const path = yield* Path.Path;
       const serverSettings = yield* ServerSettings.ServerSettingsService;
