@@ -149,6 +149,11 @@ scheme uses HTTP, so include `https://` when your server uses HTTPS.
 
 ## Desktop-managed SSH
 
+<!-- fork(ch-iwi) -->
+
+DV³ Code does not offer desktop-managed SSH, because it would install upstream T3 Code on the
+remote host. Start a server on the host and pair it with a link instead.
+
 In the desktop app, open **Settings → Connections → Add environment**, choose
 **SSH**, and enter a host or SSH alias such as `user@example.com`. T3 Code starts
 or reuses a server there and opens the port forward for you. Projects, provider

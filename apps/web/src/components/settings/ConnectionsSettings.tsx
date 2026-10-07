@@ -5,7 +5,6 @@ import {
   PlusIcon,
   QrCodeIcon,
   RouteIcon,
-  TerminalIcon,
 } from "lucide-react";
 import { useAtomValue } from "@effect/atom-react";
 import { Atom } from "effect/reactivity";
@@ -4160,15 +4159,7 @@ export function ConnectionsSettings() {
                         description: "Enter a backend host and pairing code.",
                         icon: <ChevronsLeftRightEllipsisIcon aria-hidden className="size-4" />,
                       })}
-                      {desktopBridge
-                        ? renderConnectionModeCard({
-                            mode: "ssh",
-                            title: "SSH",
-                            description:
-                              "Use local SSH config, agent, and tunnels for the backend.",
-                            icon: <TerminalIcon aria-hidden className="size-4" />,
-                          })
-                        : null}
+                      {/* fork(ch-iwi): no SSH card; DV³ desktop refuses SSH setup (apps/desktop/src/ssh/dv3SshPolicy.ts). */}
                     </div>
                     <AnimatedHeight>
                       {savedBackendMode === "ssh" ? renderSshFields() : renderRemoteModeBody()}

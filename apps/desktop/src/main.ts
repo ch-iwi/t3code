@@ -58,6 +58,7 @@ import * as DesktopPreReadyFileSystem from "./app/DesktopPreReadyFileSystem.ts";
 import * as DesktopPreReadyPlatform from "./app/DesktopPreReadyPlatform.ts";
 import * as DesktopShellEnvironment from "./shell/DesktopShellEnvironment.ts";
 import * as DesktopSshEnvironment from "./ssh/DesktopSshEnvironment.ts";
+import { withDv3SshPolicy } from "./ssh/dv3SshPolicy.ts"; // fork(ch-iwi)
 import * as DesktopSshPasswordPrompts from "./ssh/DesktopSshPasswordPrompts.ts";
 import * as DesktopState from "./app/DesktopState.ts";
 import * as DesktopLegacyLocalStorage from "./app/DesktopLegacyLocalStorage.ts";
@@ -119,9 +120,12 @@ const resolveDesktopSshCliRunner = (
 const layerDesktopSshEnvironment = Layer.unwrap(
   Effect.gen(function* () {
     const environment = yield* DesktopEnvironment.DesktopEnvironment;
-    return DesktopSshEnvironment.layer({
-      resolveCliRunner: Effect.succeed(resolveDesktopSshCliRunner(environment)),
-    });
+    // fork(ch-iwi): no remote server setup over SSH (it would install upstream T3 Code).
+    return withDv3SshPolicy(
+      DesktopSshEnvironment.layer({
+        resolveCliRunner: Effect.succeed(resolveDesktopSshCliRunner(environment)),
+      }),
+    );
   }),
 );
 

@@ -1,4 +1,5 @@
 import { OrchestrationDispatchCommandError } from "@t3tools/contracts";
+import { isProviderDriverAllowed } from "@t3tools/contracts"; // fork(ch-iwi)
 import * as Crypto from "effect/Crypto";
 import * as Orchestrator from "./orchestration-v2/Orchestrator.ts";
 
@@ -2319,7 +2320,16 @@ const layerWsRpc = (
         [WS_METHODS.chatGptReconnectProfile]: (input) => providerAuth.reconnectProfile(input),
         [WS_METHODS.chatGptImportProfile]: (input) => providerAuth.importProfile(input),
         [WS_METHODS.chatGptHandoffSubscribe]: (input) =>
-          subscribeChatGptHandoff(input, currentSessionId),
+          // fork(ch-iwi): ChatGPT sign-in belongs to Codex, which the DV³ allowlist blocks.
+          isProviderDriverAllowed("codex")
+            ? subscribeChatGptHandoff(input, currentSessionId)
+            : Stream.fail(
+                new ProviderSetupError({
+                  instanceId: input.instanceId,
+                  operation: "chatgpt-handoff",
+                  detail: "ChatGPT sign-in is not allowed in DV³ Code.",
+                }),
+              ),
         [WS_METHODS.codexAuthCallbackSubscribe]: (input) => subscribeCodexAuthCallback(input),
         [WS_METHODS.providerAuthCancel]: (input) => providerAuth.cancel(input, currentSessionId),
         [WS_METHODS.providerAuthLogout]: (input) => providerAuth.logout(input),

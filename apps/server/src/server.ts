@@ -81,6 +81,7 @@ import {
   withDv3ProviderInstancePolicy,
   withDv3SettingsPolicy,
 } from "./dv3ProviderPolicy.ts"; // fork(ch-iwi)
+import { withDv3CloudLinkPolicy, withDv3RelayClientPolicy } from "./dv3ConnectPolicy.ts"; // fork(ch-iwi)
 import * as ProjectEnrichmentService from "./project/ProjectEnrichmentService.ts";
 import * as NativeAppIconResolver from "./assets/NativeAppIconResolver.ts";
 import * as AntigravityInstallation from "./provider/AntigravityInstallation.ts";
@@ -244,7 +245,8 @@ const layerResourceDiagnostics = Layer.mergeAll(
 const layerRelayClient = Layer.unwrap(
   Effect.gen(function* () {
     const config = yield* ServerConfig.ServerConfig;
-    return RelayClient.layerCloudflared({ baseDir: config.baseDir });
+    // fork(ch-iwi): no cloudflared download without T3 Connect config.
+    return withDv3RelayClientPolicy(RelayClient.layerCloudflared({ baseDir: config.baseDir }));
   }),
 );
 
@@ -1063,7 +1065,7 @@ const layerMakeServer = Layer.unwrap(
 
     return layerServerApplication.pipe(
       // The connect routes and the startup/shutdown link work share one instance.
-      Layer.provide(CloudLink.layer),
+      Layer.provide(withDv3CloudLinkPolicy(CloudLink.layer)), // fork(ch-iwi): no relay link without Connect config
       Layer.provideMerge(layerRuntimeServices),
       Layer.provideMerge(
         McpSessionRegistry.layer.pipe(
