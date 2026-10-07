@@ -9,6 +9,11 @@ name: DV³ desktop build
 
 on:
   workflow_dispatch:
+    inputs:
+      release:
+        description: "Release build: version it as dv3-version.json as is, without the -dv3.<date>.<commit count> suffix."
+        type: boolean
+        default: false
 
 permissions:
   contents: read
@@ -42,7 +47,9 @@ jobs:
             rust_target: x86_64-pc-windows-msvc
     steps:
       # Sparse checkout skips the vendored .repos tree, whose orphaned gitlinks
-      # break actions/checkout's submodule cleanup.
+      # break actions/checkout's submodule cleanup. The full commit history
+      # (without old file contents) is fetched because the build version
+      # counts the commits on HEAD.
       - name: Checkout
         shell: bash
         env:
@@ -51,7 +58,7 @@ jobs:
           set -euo pipefail
           git init .
           git remote add origin "${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}.git"
-          git fetch --no-tags --depth=1 origin "$GITHUB_SHA"
+          git fetch --no-tags --filter=blob:none origin "$GITHUB_SHA"
           git sparse-checkout set --no-cone '/*' '!/.repos/'
           git -c checkout.workers=0 checkout --detach FETCH_HEAD
 
@@ -96,6 +103,8 @@ jobs:
 
       - name: Build desktop artifact
         shell: bash
+        env:
+          DV3_RELEASE: ${{ inputs.release }}
         run: |
           vp run dist:desktop:artifact \
             --platform "${{ matrix.platform }}" \

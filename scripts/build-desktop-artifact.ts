@@ -32,6 +32,8 @@ import {
 import { loadRepoEnv } from "./lib/public-config.ts";
 // fork(ch-iwi): DV³ Code ships without T3 Connect.
 import { assertT3ConnectDisabled } from "./lib/dv3-t3-connect.ts";
+// fork(ch-iwi): DV³ Code's own version number.
+import { resolveDv3BuildVersion } from "./lib/dv3-build-version.ts";
 import { selectDesktopRuntimeExternalDependencies } from "./lib/desktop-external-packages.ts";
 import { resolveCatalogDependencies } from "./lib/resolve-catalog.ts";
 
@@ -3468,7 +3470,8 @@ const buildDesktopArtifact = Effect.fn("buildDesktopArtifact")(function* (
       }),
   });
 
-  const appVersion = options.version ?? serverPackageJson.version;
+  // fork(ch-iwi): DV³ Code's own version (dv3-version.json) instead of upstream's.
+  const appVersion = options.version ?? (yield* resolveDv3BuildVersion(repoRoot));
   const iconAssets = resolveDesktopBuildIconAssets(appVersion);
   const commitHash = yield* resolveGitCommitHash(repoRoot);
   const mkdir = options.keepStage ? fs.makeTempDirectory : fs.makeTempDirectoryScoped;

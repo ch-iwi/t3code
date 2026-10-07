@@ -11,7 +11,7 @@
 > - **No T3 Connect.** Signing in to T3's hosted account and routing through T3's relay are turned off. Remote access over your local network or Tailscale still works.
 > - **No SSH setup.** The desktop app can't set up a server on another machine over SSH, because that would install upstream's T3 Code there. Start the server on that machine yourself and pair it by link.
 > - **No usage data.** Nothing is sent unless you set `T3CODE_TELEMETRY_ENABLED=true`.
-> - **Own installers.** Unsigned macOS (arm64), Linux (x64), and Windows (x64) installers come from the [DV³ desktop build](./.github/workflows/dv3-desktop-build.yml) workflow, named `DV3-Code-<version>-<arch>.<ext>`. The install commands below install upstream's T3 Code, not DV³ Code.
+> - **Own installers.** Unsigned macOS (arm64), Linux (x64), and Windows (x64) installers come from the [DV³ desktop build](./.github/workflows/dv3-desktop-build.yml) workflow, named `DV3-Code-<version>-<arch>.<ext>`. DV³ Code has its own version number, separate from T3 Code's. The install commands below install upstream's T3 Code, not DV³ Code.
 >
 > Maintainers: see [FORK.md](./FORK.md) for how to sync with upstream and where each customization lives.
 
