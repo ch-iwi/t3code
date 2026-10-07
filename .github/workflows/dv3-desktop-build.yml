@@ -1,8 +1,9 @@
 name: DV³ desktop build
 
 # fork(ch-iwi): Unsigned DV³ Code installers on GitHub-hosted runners, uploaded
-# as run artifacts. Upstream's release.yml needs Blacksmith runners, its signing
-# secrets, and T3 Connect config, none of which this fork has.
+# as run artifacts and attached to a draft GitHub release (tag dv3-v<version>)
+# with generated notes. Upstream's release.yml needs Blacksmith runners, its
+# signing secrets, and T3 Connect config, none of which this fork has.
 #
 # Windows builds without the embedded WSL runtime, so its WSL backend is
 # unavailable; the native Windows backend works.
@@ -120,3 +121,64 @@ jobs:
             release/DV3-Code-*
             !release/*.blockmap
           if-no-files-found: error
+
+  release:
+    name: Draft GitHub release
+    needs: build
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write
+    steps:
+      # The notes need the full history, the earlier dv3-v* release tags, and
+      # upstream's main to tell fork commits from upstream ones.
+      - name: Checkout
+        shell: bash
+        env:
+          GIT_TERMINAL_PROMPT: "0"
+        run: |
+          set -euo pipefail
+          git init .
+          git remote add origin "${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}.git"
+          git remote add upstream https://github.com/pingdotgg/t3code.git
+          git fetch --no-tags --filter=blob:none origin "$GITHUB_SHA" '+refs/tags/dv3-v*:refs/tags/dv3-v*'
+          git fetch --no-tags --filter=blob:none upstream '+refs/heads/main:refs/remotes/upstream/main'
+          git sparse-checkout set --no-cone '/.github/scripts/'
+          git -c checkout.workers=0 checkout --detach "$GITHUB_SHA"
+
+      - name: Download installers
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8
+        with:
+          pattern: DV3-Code-*
+          path: installers
+          merge-multiple: true
+
+      # Only the installers: the macOS zip exists for auto-updates, which DV³
+      # releases don't offer.
+      - name: Create draft release
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          # gh would otherwise prefer the remote named upstream.
+          GH_REPO: ${{ github.repository }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          set -euo pipefail
+          dmg=$(basename installers/DV3-Code-*-arm64.dmg)
+          version=${dmg#DV3-Code-}
+          version=${version%-arm64.dmg}
+          tag="dv3-v$version"
+          if gh release view "$tag" >/dev/null 2>&1; then
+            echo "::error::A release for $tag already exists. Delete it or build a newer commit." >&2
+            exit 1
+          fi
+          bash .github/scripts/dv3-release-notes.sh "$version" upstream/main "$RUN_URL" > notes.md
+          prerelease=()
+          if [[ $version == *-* ]]; then
+            prerelease=(--prerelease)
+          fi
+          gh release create "$tag" --draft "${prerelease[@]}" \
+            --target "$GITHUB_SHA" \
+            --title "DV³ Code $version" \
+            --notes-file notes.md \
+            installers/*.dmg installers/*.exe installers/*.AppImage
+          echo "Drafted $tag: review the notes and publish it on GitHub." >> "$GITHUB_STEP_SUMMARY"
