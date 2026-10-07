@@ -25,7 +25,7 @@ import {
 } from "./dv3ProviderPolicy.ts";
 import { AcpRegistryCatalog, AcpRegistryError } from "./provider/acp/AcpRegistrySupport.ts";
 import type { ProviderInstance } from "./provider/ProviderDriver.ts";
-import { ProviderInstanceRegistry } from "./provider/Services/ProviderInstanceRegistry.ts";
+import { ProviderInstanceRegistry } from "./provider/ProviderInstanceRegistry.ts";
 import { layerTest as serverSettingsLayerTest, ServerSettingsService } from "./serverSettings.ts";
 
 const id = ProviderInstanceId.make;

@@ -36,7 +36,7 @@ import { ServerConfig } from "./config.ts";
 import { AcpRegistryCatalog, AcpRegistryError } from "./provider/acp/AcpRegistrySupport.ts";
 import { CodexInstallation, CodexInstallationError } from "./provider/CodexInstallation.ts";
 import type { ProviderInstance } from "./provider/ProviderDriver.ts";
-import { ProviderInstanceRegistry } from "./provider/Services/ProviderInstanceRegistry.ts";
+import { ProviderInstanceRegistry } from "./provider/ProviderInstanceRegistry.ts";
 import { ServerSettingsService } from "./serverSettings.ts";
 
 const CLAUDE_DRIVER = ProviderDriverKind.make("claudeAgent");
