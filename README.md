@@ -1,5 +1,19 @@
 # T3 Code
 
+<!-- fork(ch-iwi): user-facing summary of the fork; FORK.md has the details. -->
+
+> [!NOTE]
+> **This repository is DV³ Code**, a fork of [T3 Code](https://github.com/pingdotgg/t3code) that pulls upstream updates regularly. The rest of this README is upstream's. How DV³ Code differs:
+>
+> - **Name and icons.** The app is called DV³ Code and uses the DV³ icon on desktop and web. The mobile app is unchanged.
+> - **Installs next to T3 Code.** The desktop app keeps its data in `~/.dv3` instead of `~/.t3` and has its own app ID, so both apps can be installed side by side. The `t3` command-line tool is upstream's and still uses `~/.t3`.
+> - **Approved agents only.** A DV³ server runs only Claude and the ACP Registry agents Claude (ACP), Junie, and GitHub Copilot CLI. Codex, Cursor, Grok Build, OpenCode, Antigravity, and other registry agents are blocked. A DV³ client connected to a stock T3 Code server is not restricted.
+> - **No T3 Connect.** Signing in to T3's hosted account and routing through T3's relay are turned off. Remote access over your local network or Tailscale still works.
+> - **No usage data.** Nothing is sent unless you set `T3CODE_TELEMETRY_ENABLED=true`.
+> - **Own installers.** Unsigned macOS (arm64), Linux (x64), and Windows (x64) installers come from the [DV³ desktop build](./.github/workflows/dv3-desktop-build.yml) workflow, named `DV3-Code-<version>-<arch>.<ext>`. The install commands below install upstream's T3 Code, not DV³ Code.
+>
+> Maintainers: see [FORK.md](./FORK.md) for how to sync with upstream and where each customization lives.
+
 T3 Code is an "agent harness control surface". It enables control of the agents on your machine with a best-in-class mobile app ([iOS](https://apps.apple.com/us/app/t3-code-remote-claude-more/id6787819824), [Android](https://play.google.com/store/apps/details?id=com.t3tools.t3code)), [web app](https://app.t3.codes) and [Electron-based desktop app](https://t3.codes).
 
 Works with your subscriptions on Claude Code, Codex, Cursor, Grok Build, OpenCode, and Google Antigravity. If they're set up on your computer, T3 Code can control them.
