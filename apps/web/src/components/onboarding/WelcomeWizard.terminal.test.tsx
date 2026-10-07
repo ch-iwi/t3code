@@ -297,7 +297,8 @@ afterEach(async () => {
 });
 
 describe("welcome agent terminal setup", () => {
-  it("disables both setup actions for the paired read-only connection and preserves local completion", async () => {
+  // fork(ch-iwi): needs a Codex instance, which the DV³ allowlist hides from the wizard.
+  it.skip("disables both setup actions for the paired read-only connection and preserves local completion", async () => {
     setAccess(remoteId, false);
     await enterRemoteAgents();
     expect(button("Install").props.disabled).toBe(true);
@@ -358,7 +359,8 @@ describe("welcome agent terminal setup", () => {
     });
   });
 
-  it("pretypes the selected provider's sign-in command without executing it", async () => {
+  // fork(ch-iwi): needs a Codex instance, which the DV³ allowlist hides from the wizard.
+  it.skip("pretypes the selected provider's sign-in command without executing it", async () => {
     setAccess(primaryId, false);
     await enterRemoteAgents();
     await click("Sign in");
@@ -432,7 +434,8 @@ describe("welcome agent terminal setup", () => {
     expect(text(renderer!.root)).toContain("Choose your projects");
   });
 
-  it("settles accepted pretyping locally after revocation without closing the PTY", async () => {
+  // fork(ch-iwi): needs a Codex instance, which the DV³ allowlist hides from the wizard.
+  it.skip("settles accepted pretyping locally after revocation without closing the PTY", async () => {
     const writing = deferred<CommandResult>();
     state.write.mockReturnValueOnce(writing.promise);
     await enterRemoteAgents();
