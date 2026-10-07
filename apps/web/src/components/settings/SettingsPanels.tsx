@@ -53,8 +53,9 @@ import { createModelSelection } from "@t3tools/shared/model";
 import * as Duration from "effect/Duration";
 import * as Equal from "effect/Equal";
 import * as Schema from "effect/Schema";
-import { APP_VERSION, HOSTED_APP_CHANNEL, HOSTED_APP_CHANNEL_LABEL } from "../../branding";
+import { HOSTED_APP_CHANNEL, HOSTED_APP_CHANNEL_LABEL } from "../../branding";
 import { IS_NIGHTLY_BUILD, NightlyMobileBetaRow } from "../NightlyMobileBeta";
+import { Dv3AboutVersion } from "./Dv3AboutVersion"; // fork(ch-iwi)
 import {
   canCheckForUpdate,
   getDesktopUpdateButtonTooltip,
@@ -272,7 +273,8 @@ function AboutVersionTitle() {
   return (
     <span className="inline-flex items-baseline gap-2">
       <span>Version</span>
-      <code className="text-2xs font-medium text-muted-foreground">{APP_VERSION}</code>
+      {/* fork(ch-iwi): DV³ desktop version, with upstream's as the base. */}
+      <Dv3AboutVersion />
     </span>
   );
 }
