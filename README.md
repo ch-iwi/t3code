@@ -9,6 +9,7 @@
 > - **Installs next to T3 Code.** The desktop app keeps its data in `~/.dv3` instead of `~/.t3` and has its own app ID, so both apps can be installed side by side. The `t3` command-line tool is upstream's and still uses `~/.t3`.
 > - **Approved agents only.** A DV³ server runs only Claude and the ACP Registry agents Claude (ACP), Junie, and GitHub Copilot CLI. Codex, Cursor, Grok Build, OpenCode, Antigravity, and other registry agents are blocked. A DV³ client connected to a stock T3 Code server is not restricted.
 > - **No T3 Connect.** Signing in to T3's hosted account and routing through T3's relay are turned off. Remote access over your local network or Tailscale still works.
+> - **No SSH setup.** The desktop app can't set up a server on another machine over SSH, because that would install upstream's T3 Code there. Start the server on that machine yourself and pair it by link.
 > - **No usage data.** Nothing is sent unless you set `T3CODE_TELEMETRY_ENABLED=true`.
 > - **Own installers.** Unsigned macOS (arm64), Linux (x64), and Windows (x64) installers come from the [DV³ desktop build](./.github/workflows/dv3-desktop-build.yml) workflow, named `DV3-Code-<version>-<arch>.<ext>`. The install commands below install upstream's T3 Code, not DV³ Code.
 >
