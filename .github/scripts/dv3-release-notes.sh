@@ -73,8 +73,8 @@ cat <<EOF
 | Windows x64 | \`DV3-Code-$version-x64.exe\` |
 | Linux x64 | \`DV3-Code-$version-x86_64.AppImage\` |
 
-**These builds are unsigned.**
-- macOS: if the app won't open, allow it under System Settings → Privacy & Security, or run \`xattr -cr "/Applications/DV³ Code (Alpha).app"\`.
+**These builds are not signed with a Developer ID.**
+- macOS: the first launch is blocked because Apple can't verify the app. Click Done, then open System Settings → Privacy & Security and click Open Anyway next to DV³ Code. Older DV³ releases instead say the app is damaged; for those, run \`xattr -cr "/Applications/DV³ Code (Alpha).app"\`.
 - Windows: SmartScreen warns before the installer runs. The WSL backend is not included; agents run natively on Windows.
 - Linux: make the AppImage executable with \`chmod +x\` before running it.
 EOF

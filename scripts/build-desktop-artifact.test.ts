@@ -691,6 +691,8 @@ it.layer(NodeServices.layer)("build-desktop-artifact", (it) => {
       assert.deepStrictEqual(win.files, DESKTOP_FILE_EXCLUSIONS);
       assert.deepStrictEqual(winWithoutWslRuntime.files, win.files);
       assert.notProperty(mac.mac as Record<string, unknown>, "sign");
+      // fork(ch-iwi): unsigned macOS builds are ad-hoc signed so Gatekeeper offers Open Anyway.
+      assert.include(mac.mac as Record<string, unknown>, { identity: "-", hardenedRuntime: false });
       for (const config of [linux, win]) {
         assert.deepStrictEqual(config.electronLanguages, DESKTOP_ELECTRON_LANGUAGES);
       }

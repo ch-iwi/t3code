@@ -2734,6 +2734,10 @@ export const createBuildConfig = Effect.fn("createBuildConfig")(function* (
         },
       ],
       ...(signed ? { sign: path.join(repoRoot, "scripts/sign-macos.ts") } : {}),
+      // fork(ch-iwi): ad-hoc sign unsigned builds. Without a valid bundle signature, macOS
+      // calls a downloaded app "damaged" and offers no Open Anyway. Library validation
+      // rejects ad-hoc signed frameworks, so the hardened runtime stays off.
+      ...(signed ? {} : { identity: "-", hardenedRuntime: false }),
       ...(macPasskeySigning
         ? {
             entitlements: macPasskeySigning.entitlementsPath,
