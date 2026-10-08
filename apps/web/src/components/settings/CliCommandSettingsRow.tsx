@@ -39,7 +39,8 @@ export function CliCommandSettingsRow() {
           toastManager.add(
             stackedThreadToast({
               type: "error",
-              title: action === "install" ? "Could not install t3" : "Could not remove t3",
+              // fork(ch-iwi): DV³ Code installs its CLI as `dv3` (DesktopCliShim.COMMAND_NAME).
+              title: action === "install" ? "Could not install dv3" : "Could not remove dv3",
               description: error instanceof Error ? error.message : "Something went wrong.",
             }),
           );
@@ -51,11 +52,12 @@ export function CliCommandSettingsRow() {
 
   if (!bridge || !state?.supported) return null;
   const installed = state.installedPath !== null;
+  // fork(ch-iwi): DV³ Code installs its CLI as `dv3` (DesktopCliShim.COMMAND_NAME).
   const description = !installed
-    ? "Run T3 Code's CLI as `t3` from any terminal."
+    ? "Run DV³ Code's CLI as `dv3` from any terminal."
     : state.onPath
       ? `Installed at ${state.installedPath}. Open a new terminal to use it.`
-      : `Installed at ${state.installedPath}, which is not on your PATH yet. Add its folder to your PATH to run \`t3\`.`;
+      : `Installed at ${state.installedPath}, which is not on your PATH yet. Add its folder to your PATH to run \`dv3\`.`;
 
   return (
     <SettingsRow

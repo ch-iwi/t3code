@@ -6,7 +6,7 @@
 > **This repository is DV³ Code**, a fork of [T3 Code](https://github.com/pingdotgg/t3code) that pulls upstream updates regularly. The rest of this README is upstream's. How DV³ Code differs:
 >
 > - **Name and icons.** The app is called DV³ Code and uses the DV³ icon on desktop and web. The mobile app is unchanged.
-> - **Installs next to T3 Code.** The desktop app keeps its data in `~/.dv3` instead of `~/.t3` and has its own app ID, so both apps can be installed side by side. The `t3` command-line tool is upstream's and still uses `~/.t3`.
+> - **Installs next to T3 Code.** The desktop app keeps its data in `~/.dv3` instead of `~/.t3` and has its own app ID, so both apps can be installed side by side. The `t3` command-line tool is upstream's and still uses `~/.t3`. Settings → General → dv3 command installs DV³ Code's own command-line tool as `dv3`, so it never replaces T3 Code's `t3`.
 > - **Approved agents only.** A DV³ server runs only Claude and the ACP Registry agents Claude (ACP), Junie, and GitHub Copilot CLI. Codex, Cursor, Grok Build, OpenCode, Antigravity, and other registry agents are blocked. A DV³ client connected to a stock T3 Code server is not restricted.
 > - **No T3 Connect.** Signing in to T3's hosted account and routing through T3's relay are turned off. Remote access over your local network or Tailscale still works.
 > - **No SSH setup.** The desktop app can't set up a server on another machine over SSH, because that would install upstream's T3 Code there. Start the server on that machine yourself and pair it by link.

@@ -15,6 +15,8 @@ import { makeComponentLogger } from "./DesktopObservability.ts";
 const { logInfo, logWarning } = makeComponentLogger("desktop-cli-shim");
 
 export const MARKER = "Written by T3 Code: runs the desktop app's bundled t3 CLI.";
+// fork(ch-iwi): DV³ Code installs its CLI as `dv3`, so it never takes over or removes T3 Code's `t3`.
+export const COMMAND_NAME = "dv3";
 
 /** Server entry inside the app, relative to its server root (an asar archive when packaged). */
 const SERVER_ENTRY = "apps/server/dist/bin.mjs";
@@ -130,7 +132,7 @@ export const launcherPath = (environment: DesktopEnvironment.DesktopEnvironment[
   environment.path.join(
     environment.baseDir,
     "bin",
-    environment.platform === "win32" ? "t3.cmd" : "t3",
+    environment.platform === "win32" ? `${COMMAND_NAME}.cmd` : COMMAND_NAME, // fork(ch-iwi)
   );
 
 /**

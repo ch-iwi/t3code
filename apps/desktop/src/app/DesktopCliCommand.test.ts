@@ -12,6 +12,9 @@ import * as DesktopCliCommand from "./DesktopCliCommand.ts";
 import * as DesktopCliShim from "./DesktopCliShim.ts";
 import * as DesktopEnvironment from "./DesktopEnvironment.ts";
 
+// fork(ch-iwi): DV³ Code installs its CLI as `dv3`; upstream's cases use whichever name the app installs.
+const cli = DesktopCliShim.COMMAND_NAME;
+
 const environmentFor = (
   path: Path.Path,
   input: { home: string; baseDir: string; platform?: NodeJS.Platform; isPackaged?: boolean },
@@ -92,19 +95,19 @@ it.layer(NodeServices.layer)("DesktopCliCommand", (it) => {
       const path = yield* Path.Path;
       const home = yield* fs.makeTempDirectoryScoped();
       const command = yield* commandIn({ home });
-      const link = path.join(home, ".local", "bin", "t3");
+      const link = path.join(home, ".local", "bin", cli);
 
       expect(yield* command.state).toEqual({ supported: true, installedPath: null, onPath: false });
       // Install writes the launcher itself, even when no local backend ever did.
       const installed = yield* command.install;
       expect(installed.installedPath).toBe(link);
-      expect(yield* fs.readLink(link)).toBe(path.join(home, ".t3", "bin", "t3"));
+      expect(yield* fs.readLink(link)).toBe(path.join(home, ".t3", "bin", cli));
       expect((yield* command.install).installedPath).toBe(link);
 
       expect((yield* command.uninstall).installedPath).toBeNull();
       expect(yield* fs.exists(link)).toBe(false);
       // The launcher itself stays for setup commands.
-      expect(yield* fs.exists(path.join(home, ".t3", "bin", "t3"))).toBe(true);
+      expect(yield* fs.exists(path.join(home, ".t3", "bin", cli))).toBe(true);
     }).pipe(Effect.scoped),
   );
 
@@ -114,18 +117,18 @@ it.layer(NodeServices.layer)("DesktopCliCommand", (it) => {
       const path = yield* Path.Path;
       const home = yield* fs.makeTempDirectoryScoped();
       const command = yield* commandIn({ home });
-      const theirs = path.join(home, ".local", "bin", "t3");
+      const theirs = path.join(home, ".local", "bin", cli);
       yield* fs.makeDirectory(path.dirname(theirs), { recursive: true });
       yield* fs.writeFileString(theirs, "npm's t3\n");
       // Even a broken link in the next folder is someone else's.
       yield* fs.makeDirectory(path.join(home, "bin"), { recursive: true });
-      yield* fs.symlink(path.join(home, "gone"), path.join(home, "bin", "t3"));
+      yield* fs.symlink(path.join(home, "gone"), path.join(home, "bin", cli));
 
       const error = yield* Effect.flip(command.install);
-      expect(error.message).toContain("Another t3 command is already installed");
+      expect(error.message).toContain(`Another ${cli} command is already installed`); // fork(ch-iwi)
       yield* command.uninstall;
       expect(yield* fs.readFileString(theirs)).toBe("npm's t3\n");
-      expect(yield* fs.readLink(path.join(home, "bin", "t3"))).toBe(path.join(home, "gone"));
+      expect(yield* fs.readLink(path.join(home, "bin", cli))).toBe(path.join(home, "gone"));
     }).pipe(Effect.scoped),
   );
 
@@ -141,10 +144,10 @@ it.layer(NodeServices.layer)("DesktopCliCommand", (it) => {
       expect((yield* after.state).installedPath).toBe(link);
       // Installing again points the link at this home's launcher.
       expect((yield* after.install).installedPath).toBe(link);
-      expect(yield* fs.readLink(link!)).toBe(path.join(home, "new-t3", "bin", "t3"));
+      expect(yield* fs.readLink(link!)).toBe(path.join(home, "new-t3", "bin", cli));
       yield* after.uninstall;
-      expect(yield* fs.exists(path.join(home, ".local", "bin", "t3"))).toBe(false);
-      expect(yield* fs.exists(path.join(home, "bin", "t3"))).toBe(false);
+      expect(yield* fs.exists(path.join(home, ".local", "bin", cli))).toBe(false);
+      expect(yield* fs.exists(path.join(home, "bin", cli))).toBe(false);
     }).pipe(Effect.scoped),
   );
 
@@ -157,11 +160,11 @@ it.layer(NodeServices.layer)("DesktopCliCommand", (it) => {
       const binary = path.join(home, "native-t3");
       yield* fs.writeFileString(binary, `${"\0".repeat(64 * 1024)}${DesktopCliShim.MARKER}`);
       yield* fs.makeDirectory(path.join(home, ".local", "bin"), { recursive: true });
-      yield* fs.symlink(binary, path.join(home, ".local", "bin", "t3"));
+      yield* fs.symlink(binary, path.join(home, ".local", "bin", cli));
       const command = yield* commandIn({ home });
       expect((yield* command.state).installedPath).toBeNull();
       yield* command.uninstall;
-      expect(yield* fs.readLink(path.join(home, ".local", "bin", "t3"))).toBe(binary);
+      expect(yield* fs.readLink(path.join(home, ".local", "bin", cli))).toBe(binary);
     }).pipe(Effect.scoped),
   );
 
@@ -172,16 +175,16 @@ it.layer(NodeServices.layer)("DesktopCliCommand", (it) => {
       const home = yield* fs.makeTempDirectoryScoped();
       const shadow = path.join(home, "shadow");
       yield* fs.makeDirectory(shadow);
-      yield* fs.writeFileString(path.join(shadow, "t3"), "#!/bin/sh\n", { mode: 0o755 });
+      yield* fs.writeFileString(path.join(shadow, cli), "#!/bin/sh\n", { mode: 0o755 });
       const previous = process.env.PATH;
       process.env.PATH = [shadow, path.join(home, ".local", "bin")].join(":");
       yield* Effect.addFinalizer(() => Effect.sync(() => (process.env.PATH = previous)));
 
       const command = yield* commandIn({ home });
       const installed = yield* command.install;
-      expect(installed.installedPath).toBe(path.join(home, ".local", "bin", "t3"));
+      expect(installed.installedPath).toBe(path.join(home, ".local", "bin", cli));
       expect(installed.onPath).toBe(false);
-      yield* fs.remove(path.join(shadow, "t3"));
+      yield* fs.remove(path.join(shadow, cli));
       expect((yield* command.state).onPath).toBe(true);
     }).pipe(Effect.scoped),
   );
@@ -202,7 +205,7 @@ it.layer(NodeServices.layer)("DesktopCliCommand", (it) => {
       registry.failReads = false;
       const launcherDir = DesktopCliShim.launcherPath(
         environmentFor(yield* Path.Path, { home, baseDir: `${home}/.t3`, platform: "win32" }),
-      ).replace(/[\\/]t3\.cmd$/, "");
+      ).replace(new RegExp(`[\\\\/]${cli}\\.cmd$`), ""); // fork(ch-iwi)
       yield* command.install;
       expect(registry.path).toBe(`${userPath};${launcherDir}`);
       yield* command.uninstall;
@@ -238,6 +241,32 @@ it.layer(NodeServices.layer)("DesktopCliCommand", (it) => {
         isPackaged: false,
       });
       expect((yield* command.state).supported).toBe(false);
+    }).pipe(Effect.scoped),
+  );
+
+  // fork(ch-iwi): DV³ Code installs next to T3 Code; each app's command must leave the other's alone.
+  it.effect("leaves T3 Code's own t3 command alone", () =>
+    Effect.gen(function* () {
+      const fs = yield* FileSystem.FileSystem;
+      const path = yield* Path.Path;
+      const home = yield* fs.makeTempDirectoryScoped();
+      // T3 Code's link carries the same launcher marker.
+      const t3Launcher = path.join(home, ".t3", "bin", "t3");
+      yield* fs.makeDirectory(path.dirname(t3Launcher), { recursive: true });
+      yield* fs.writeFileString(t3Launcher, `#!/bin/sh\n# ${DesktopCliShim.MARKER}\n`);
+      const t3Link = path.join(home, ".local", "bin", "t3");
+      yield* fs.makeDirectory(path.dirname(t3Link), { recursive: true });
+      yield* fs.symlink(t3Launcher, t3Link);
+
+      const command = yield* commandIn({ home, baseDir: path.join(home, ".dv3") });
+      expect((yield* command.state).installedPath).toBeNull();
+      const installed = yield* command.install;
+      expect(installed.installedPath).toBe(path.join(home, ".local", "bin", "dv3"));
+      expect(yield* fs.readLink(installed.installedPath!)).toBe(
+        path.join(home, ".dv3", "bin", "dv3"),
+      );
+      yield* command.uninstall;
+      expect(yield* fs.readLink(t3Link)).toBe(t3Launcher);
     }).pipe(Effect.scoped),
   );
 });

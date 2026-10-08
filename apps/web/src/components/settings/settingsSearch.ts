@@ -505,7 +505,7 @@ export const SETTINGS_SEARCH_ITEMS = [
   },
   {
     id: "cli-command",
-    title: "t3 command",
+    title: "dv3 command", // fork(ch-iwi): DV³ Code installs its CLI as `dv3`
     to: "/settings/general",
     searchTerms: ["cli terminal shell path install command line"],
     desktopOnly: true,
