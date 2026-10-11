@@ -52,6 +52,7 @@ import { writeFileStringAtomically } from "@t3tools/shared/atomicWrite";
 import * as ServerConfig from "../config.ts";
 import * as ServerSettings from "../serverSettings.ts";
 import { BUILT_IN_USAGE_DRIVERS, type BuiltInUsageReadersEnv } from "../provider/builtInDrivers.ts";
+import { Dv3UsageDriverAllowed } from "../dv3UsagePolicy.ts"; // fork(ch-iwi)
 import type { ProviderDriver } from "@t3tools/provider-core/server/driver";
 import { mergeProviderInstanceEnvironment } from "@t3tools/provider-core/server/instanceEnvironment";
 import type {
@@ -228,6 +229,7 @@ export const make = Effect.gen(function* () {
   const settingsService = yield* ServerSettings.ServerSettingsService;
   const httpClient = yield* HttpClient.HttpClient;
   const hostEnvironment = yield* HostProcess.Environment;
+  const isUsageDriverAllowed = yield* Dv3UsageDriverAllowed; // fork(ch-iwi)
   // The readers yield their own services; scans run them against this context.
   const readerContext = yield* Effect.context<BuiltInUsageReadersEnv>();
 
@@ -377,6 +379,7 @@ export const make = Effect.gen(function* () {
     const dirs: Array<TranscriptSource> = [];
     const seen = new Set<string>();
     for (const { driver, reader } of transcriptReaders) {
+      if (!isUsageDriverAllowed(driver.driverKind)) continue; // fork(ch-iwi)
       const { provider, format } = reader;
       const directories = yield* Effect.forEach(
         yield* usageInstances(driver, settings),
@@ -658,7 +661,7 @@ export const make = Effect.gen(function* () {
     );
 
     const scans = Effect.forEach(
-      scanReaders,
+      scanReaders.filter(({ driver }) => isUsageDriverAllowed(driver.driverKind)), // fork(ch-iwi)
       ({ driver, reader }) =>
         usageInstances(driver, settings)
           .pipe(

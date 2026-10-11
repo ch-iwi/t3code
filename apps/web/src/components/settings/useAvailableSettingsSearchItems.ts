@@ -1,5 +1,6 @@
 import { useMemo } from "react";
 import { AuthEnvironmentMaintainScope } from "@t3tools/contracts";
+import { isProviderDriverAllowed } from "@t3tools/contracts"; // fork(ch-iwi)
 
 import { usePrimaryCloudLinkState } from "~/cloud/primaryCloudLinkState";
 import { hasCloudPublicConfig } from "~/cloud/publicConfig";
@@ -61,7 +62,8 @@ export function useAvailableSettingsSearchItems(scopeSearch: SettingsScopeSearch
         hasThreadAutoSettlement:
           getThreadAutoSettlementSearchAvailability(environments).eligibleEnvironmentIds.length > 0,
         managedTunnelActive,
-      }),
+        // fork(ch-iwi): DV³ servers never read Cursor account usage (apps/server/src/dv3UsagePolicy.ts).
+      }).filter((item) => item.id !== "cursor-keychain-usage" || isProviderDriverAllowed("cursor")),
     [
       managedTunnelActive,
       canManageLocalBackend,

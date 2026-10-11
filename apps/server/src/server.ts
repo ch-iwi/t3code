@@ -85,6 +85,7 @@ import {
   withDv3SettingsPolicy,
 } from "./dv3ProviderPolicy.ts"; // fork(ch-iwi)
 import { withDv3CloudLinkPolicy, withDv3RelayClientPolicy } from "./dv3ConnectPolicy.ts"; // fork(ch-iwi)
+import { Dv3UsagePolicyLive } from "./dv3UsagePolicy.ts"; // fork(ch-iwi)
 import * as ProjectEnrichmentService from "./project/ProjectEnrichmentService.ts";
 import * as NativeAppIconResolver from "./assets/NativeAppIconResolver.ts";
 import * as AntigravityInstallation from "./provider/AntigravityInstallation.ts";
@@ -265,6 +266,7 @@ const layerBackground = BackgroundPolicy.layer.pipe(
 );
 
 const layerUsage = UsageService.layer.pipe(
+  Layer.provide(Dv3UsagePolicyLive), // fork(ch-iwi): no usage history from blocked providers
   Layer.provide(
     Layer.mergeAll(
       AntigravityUsage.layer,

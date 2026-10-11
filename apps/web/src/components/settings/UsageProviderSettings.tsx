@@ -1,4 +1,5 @@
 import type { EnvironmentId, UnifiedSettings } from "@t3tools/contracts";
+import { isProviderDriverAllowed } from "@t3tools/contracts"; // fork(ch-iwi)
 import { useAtomValue } from "@effect/atom-react";
 import { PlusIcon } from "lucide-react";
 import { useState } from "react";
@@ -76,7 +77,8 @@ export function UsageProviderSettings({
           ) : null
         }
       >
-        {platform?.os === "darwin" ? (
+        {/* fork(ch-iwi): DV³ servers never read Cursor usage (apps/server/src/dv3UsagePolicy.ts). */}
+        {platform?.os === "darwin" && isProviderDriverAllowed("cursor") ? (
           <SettingsRow
             id="cursor-keychain-usage"
             title="Cursor account usage"
