@@ -95,6 +95,7 @@ import {
 } from "./usageShortcuts";
 import { useEscapeToGoBack } from "../../hooks/useNavigateBack";
 import { PROVIDER_ORDER, PROVIDER_PRESENTATION, providersWithUsage } from "./usageProviders";
+import { dv3FilterMenuProviders } from "./dv3UsageProviders"; // fork(ch-iwi)
 import {
   readUsagePagePreferences,
   saveUsagePagePreferences,
@@ -405,6 +406,7 @@ export function UsagePage() {
         <WorkspaceBreadcrumbSeparator />
         <WorkspaceBreadcrumbItem current className="min-w-10">
           <UsageProviderFilter
+            providers={dv3FilterMenuProviders(providersWithData, hiddenProviders)}
             hiddenProviders={hiddenProviders}
             onChange={(next) => updatePreferences({ hiddenProviders: next })}
           />
@@ -1371,16 +1373,19 @@ function UsageEnvironmentFilter({
 }
 
 /** Provider visibility shared by every tab. Stored as the hidden set. */
+// fork(ch-iwi): `providers` is the menu's list, which leaves out blocked providers without usage.
 function UsageProviderFilter({
+  providers,
   hiddenProviders,
   onChange,
 }: {
+  readonly providers: readonly UsageProviderKind[];
   readonly hiddenProviders: ReadonlySet<UsageProviderKind>;
   readonly onChange: (hiddenProviders: readonly UsageProviderKind[]) => void;
 }) {
-  const visible = PROVIDER_ORDER.filter((provider) => !hiddenProviders.has(provider));
+  const visible = providers.filter((provider) => !hiddenProviders.has(provider));
   const label =
-    visible.length === PROVIDER_ORDER.length
+    visible.length === providers.length
       ? "All providers"
       : visible.length === 0
         ? "No providers"
@@ -1399,14 +1404,14 @@ function UsageProviderFilter({
       </MenuTrigger>
       <MenuPopup align="start">
         <MenuCheckboxItem
-          checked={hiddenProviders.size === 0}
+          checked={visible.length === providers.length}
           closeOnClick={false}
           onCheckedChange={(checked) => onChange(checked ? [] : PROVIDER_ORDER)}
         >
           All providers
         </MenuCheckboxItem>
         <MenuSeparator />
-        {PROVIDER_ORDER.map((provider) => (
+        {providers.map((provider) => (
           <MenuCheckboxItem
             key={provider}
             checked={!hiddenProviders.has(provider)}
