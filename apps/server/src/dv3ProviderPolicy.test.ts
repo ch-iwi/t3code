@@ -23,8 +23,11 @@ import {
   withDv3ProviderInstancePolicy,
   withDv3SettingsPolicy,
 } from "./dv3ProviderPolicy.ts";
-import { AcpRegistryCatalog, AcpRegistryError } from "./provider/acp/AcpRegistrySupport.ts";
-import type { ProviderInstance } from "./provider/ProviderDriver.ts";
+import {
+  AcpRegistryCatalog,
+  AcpRegistryError,
+} from "@t3tools/provider-acp-registry/server/AcpRegistrySupport";
+import type { ProviderInstance } from "@t3tools/provider-core/server/driver";
 import { ProviderInstanceRegistry } from "./provider/ProviderInstanceRegistry.ts";
 import { layerTest as serverSettingsLayerTest, ServerSettingsService } from "./serverSettings.ts";
 
@@ -52,12 +55,6 @@ describe("applyDv3ProviderPolicy", () => {
       "claude_work",
       "junie",
     ]);
-    assert.strictEqual(settings.providers.codex.enabled, false);
-    assert.strictEqual(settings.providers.cursor.enabled, false);
-    assert.strictEqual(
-      settings.providers.claudeAgent.enabled,
-      settingsWithEveryKindOfInstance.providers.claudeAgent.enabled,
-    );
   });
 
   it("moves model selections off disallowed providers", () => {

@@ -8,7 +8,7 @@ import * as Layer from "effect/Layer";
 import * as HttpServer from "effect/http/HttpServer";
 import * as HttpServerRequest from "effect/http/HttpServerRequest";
 import * as HttpServerResponse from "effect/http/HttpServerResponse";
-import { HostProcessArchitecture, HostProcessPlatform } from "@t3tools/shared/hostProcess";
+import * as HostProcess from "@t3tools/shared/HostProcess";
 
 import * as ServerConfig from "./config.ts";
 import * as AnalyticsService from "./telemetry/AnalyticsService.ts";
@@ -38,8 +38,8 @@ const recordAndFlush = (env: Record<string, unknown>) =>
       ),
       Layer.provide(
         Layer.mergeAll(
-          Layer.succeed(HostProcessPlatform, "darwin"),
-          Layer.succeed(HostProcessArchitecture, "arm64"),
+          Layer.succeed(HostProcess.Platform, "darwin"),
+          Layer.succeed(HostProcess.Architecture, "arm64"),
         ),
       ),
       Layer.provideMerge(NodeHttpServer.layerTest),

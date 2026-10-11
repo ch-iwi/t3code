@@ -3,8 +3,8 @@
 // Upstream services stay untouched; server.ts wraps three of them where it
 // builds the runtime, so every consumer (web, desktop, mobile, MCP tools,
 // scheduled tasks) sees the restricted view:
-//   - settings: disallowed provider instances are dropped, disallowed built-in
-//     providers read as disabled, and model selections fall back to Claude.
+//   - settings: disallowed provider instances are dropped and model
+//     selections fall back to Claude.
 //     The settings file on disk keeps everything.
 //   - provider instance registry: instances of disallowed drivers cannot be
 //     looked up, so no session, turn, or text generation can run on them.
@@ -33,9 +33,12 @@ import * as Path from "effect/Path";
 import * as Stream from "effect/Stream";
 
 import { ServerConfig } from "./config.ts";
-import { AcpRegistryCatalog, AcpRegistryError } from "./provider/acp/AcpRegistrySupport.ts";
+import {
+  AcpRegistryCatalog,
+  AcpRegistryError,
+} from "@t3tools/provider-acp-registry/server/AcpRegistrySupport";
+import type { ProviderInstance } from "@t3tools/provider-core/server/driver";
 import { CodexInstallation, CodexInstallationError } from "./provider/CodexInstallation.ts";
-import type { ProviderInstance } from "./provider/ProviderDriver.ts";
 import { ProviderInstanceRegistry } from "./provider/ProviderInstanceRegistry.ts";
 import { ServerSettingsService } from "./serverSettings.ts";
 
@@ -56,12 +59,6 @@ export function applyDv3ProviderPolicy(settings: ServerSettings): ServerSettings
       isProviderInstanceConfigAllowed(instance),
     ),
   ) as ServerSettings["providerInstances"];
-  const providers = Object.fromEntries(
-    Object.entries(settings.providers).map(([driver, provider]) => [
-      driver,
-      isProviderDriverAllowed(driver) ? provider : { ...provider, enabled: false },
-    ]),
-  ) as ServerSettings["providers"];
   // Explicit instances survived the filter above; otherwise the id is a
   // built-in driver's default instance, which is named after its driver.
   const isSelectionAllowed = (selection: ModelSelection) =>
@@ -71,7 +68,6 @@ export function applyDv3ProviderPolicy(settings: ServerSettings): ServerSettings
 
   return {
     ...settings,
-    providers,
     providerInstances,
     textGenerationModelSelection: isSelectionAllowed(settings.textGenerationModelSelection)
       ? settings.textGenerationModelSelection

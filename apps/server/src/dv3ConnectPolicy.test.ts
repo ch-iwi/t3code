@@ -28,6 +28,7 @@ const innerRelayClient = Layer.succeed(
       Effect.sync(() => reached.add("installWithProgress")).pipe(
         Effect.andThen(Effect.die("inner")),
       ),
+    pruneManagedVersions: Effect.void,
   }),
 );
 

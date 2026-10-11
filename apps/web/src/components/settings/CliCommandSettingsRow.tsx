@@ -53,11 +53,13 @@ export function CliCommandSettingsRow() {
   if (!bridge || !state?.supported) return null;
   const installed = state.installedPath !== null;
   // fork(ch-iwi): DV³ Code installs its CLI as `dv3` (DesktopCliShim.COMMAND_NAME).
-  const description = !installed
-    ? "Run DV³ Code's CLI as `dv3` from any terminal."
-    : state.onPath
-      ? `Installed at ${state.installedPath}. Open a new terminal to use it.`
-      : `Installed at ${state.installedPath}, which is not on your PATH yet. Add its folder to your PATH to run \`dv3\`.`;
+  const description = state.shadowedBy
+    ? `Another dv3 at ${state.shadowedBy} runs first in a new terminal. Remove it to use DV³ Code's.`
+    : !installed
+      ? "Run DV³ Code's CLI as `dv3` from any terminal."
+      : state.onPath
+        ? `Installed at ${state.installedPath}. Open a new terminal to use it.`
+        : `Installed at ${state.installedPath}, which is not on your PATH yet. Add its folder to your PATH to run \`dv3\`.`;
 
   return (
     <SettingsRow
