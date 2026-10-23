@@ -147,7 +147,8 @@ function setup() {
 }
 
 describe("AddProviderInstanceDialog environment routing", () => {
-  it("chooses an unused identity for another account without replacing configured instances", async () => {
+  // fork(ch-iwi): needs a Codex instance, which the DV³ allowlist hides from this dialog.
+  it.skip("chooses an unused identity for another account without replacing configured instances", async () => {
     setup();
     settingsHooks.read.mockReturnValue({
       providerInstances: { codex_2: { driver: "codex", enabled: false } },
@@ -247,7 +248,8 @@ describe("AddProviderInstanceDialog environment routing", () => {
     expect(signInStep()).toBeNull();
   });
 
-  it("rejects a queued save after the provider grant is revoked", async () => {
+  // fork(ch-iwi): needs a Codex instance, which the DV³ allowlist hides from this dialog.
+  it.skip("rejects a queued save after the provider grant is revoked", async () => {
     setup();
     await using screen = await prepareCodexInstance();
     const save = button("Add instance");
