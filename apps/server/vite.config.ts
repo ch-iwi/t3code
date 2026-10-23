@@ -138,7 +138,8 @@ export default mergeConfig(
       fileParallelism: false,
       sequence: { sequencer: WeightedShardSequencer },
       // Appended to the root setup, which mergeConfig concatenates.
-      setupFiles: ["./src/testUtils/gitConfig.setup.ts"],
+      // fork(ch-iwi): dv3Test.setup.ts lets upstream's tests use the pinned runtime.
+      setupFiles: ["./src/testUtils/gitConfig.setup.ts", "./src/dv3Test.setup.ts"],
       hookTimeout: 120_000,
       testTimeout: 120_000,
     },

@@ -22,6 +22,10 @@ import {
 
 import * as HostProcess from "@t3tools/shared/HostProcess";
 
+import {
+  DV3_PINNED_RUNTIME_DISABLED_STEP,
+  dv3PinnedRuntimeInstallsAllowed,
+} from "../dv3PinnedRuntimePolicy.ts"; // fork(ch-iwi)
 import * as ProcessRunner from "../processRunner.ts";
 import { isExactServiceVersion, parseServiceState, SERVICE_STATE_FILE } from "./serviceProtocol.ts";
 
@@ -367,7 +371,10 @@ const installPinnedRuntime = Effect.fn("cloud.pinned_runtime.ensure_installed")(
 });
 
 export const ensurePinnedRuntimeInstalled = (input: PinnedRuntimeInstallInput) =>
-  pinnedRuntimeInstallLock.withPermit(installPinnedRuntime(input));
+  // fork(ch-iwi): no upstream t3 release downloads (dv3PinnedRuntimePolicy.ts).
+  !dv3PinnedRuntimeInstallsAllowed
+    ? Effect.fail(new PinnedRuntimeInstallError({ step: DV3_PINNED_RUNTIME_DISABLED_STEP }))
+    : pinnedRuntimeInstallLock.withPermit(installPinnedRuntime(input));
 
 const PINNED_RUNTIME_PRUNED_PREFIX = ".pruned-";
 /**
