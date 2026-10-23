@@ -1,4 +1,5 @@
 import { EnvironmentId, ProviderDriverKind, type AcpRegistrySearchAgent } from "@t3tools/contracts";
+import { isProviderDriverAllowed } from "@t3tools/contracts"; // fork(ch-iwi)
 import { userEvent } from "vite-plus/test/browser";
 import { describe, expect, it, vi } from "vite-plus/test";
 
@@ -148,26 +149,29 @@ function setup() {
 
 describe("AddProviderInstanceDialog environment routing", () => {
   // fork(ch-iwi): needs a Codex instance, which the DV³ allowlist hides from this dialog.
-  it.skip("chooses an unused identity for another account without replacing configured instances", async () => {
-    setup();
-    settingsHooks.read.mockReturnValue({
-      providerInstances: { codex_2: { driver: "codex", enabled: false } },
-    });
-    await using _screen = await render(dialog());
-    await click("Configure manually");
-    await click("Next");
-    await click("Add instance");
-    expect(settingsHooks.mutate).toHaveBeenCalledWith({
-      operation: "create",
-      instanceId: "codex_3",
-      instance: {
-        driver: "codex",
-        enabled: true,
-        displayName: "Codex",
-        config: { setupMode: "existing" },
-      },
-    });
-  });
+  it.skipIf(!isProviderDriverAllowed("codex"))(
+    "chooses an unused identity for another account without replacing configured instances",
+    async () => {
+      setup();
+      settingsHooks.read.mockReturnValue({
+        providerInstances: { codex_2: { driver: "codex", enabled: false } },
+      });
+      await using _screen = await render(dialog());
+      await click("Configure manually");
+      await click("Next");
+      await click("Add instance");
+      expect(settingsHooks.mutate).toHaveBeenCalledWith({
+        operation: "create",
+        instanceId: "codex_3",
+        instance: {
+          driver: "codex",
+          enabled: true,
+          displayName: "Codex",
+          config: { setupMode: "existing" },
+        },
+      });
+    },
+  );
 
   it("awaits an atomic create before closing and retains prepared ACP metadata", async () => {
     setup();
@@ -249,18 +253,21 @@ describe("AddProviderInstanceDialog environment routing", () => {
   });
 
   // fork(ch-iwi): needs a Codex instance, which the DV³ allowlist hides from this dialog.
-  it.skip("rejects a queued save after the provider grant is revoked", async () => {
-    setup();
-    await using screen = await prepareCodexInstance();
-    const save = button("Add instance");
-    actions.canManageProviders = false;
-    // The rendered button is still enabled; the click must recheck the live grant.
-    await act(async () => save.click());
+  it.skipIf(!isProviderDriverAllowed("codex"))(
+    "rejects a queued save after the provider grant is revoked",
+    async () => {
+      setup();
+      await using screen = await prepareCodexInstance();
+      const save = button("Add instance");
+      actions.canManageProviders = false;
+      // The rendered button is still enabled; the click must recheck the live grant.
+      await act(async () => save.click());
 
-    expect(settingsHooks.mutate).not.toHaveBeenCalled();
-    expect(actions.toast).not.toHaveBeenCalled();
-    expect(actions.onOpenChange).not.toHaveBeenCalled();
-    await screen.rerender(dialog());
-    expect(button("Add instance").disabled).toBe(true);
-  });
+      expect(settingsHooks.mutate).not.toHaveBeenCalled();
+      expect(actions.toast).not.toHaveBeenCalled();
+      expect(actions.onOpenChange).not.toHaveBeenCalled();
+      await screen.rerender(dialog());
+      expect(button("Add instance").disabled).toBe(true);
+    },
+  );
 });
