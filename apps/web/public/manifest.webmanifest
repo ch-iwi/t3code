@@ -1,5 +1,7 @@
 {
   "id": "/",
+  "name": "DV³ Code",
+  "short_name": "DV³ Code",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",

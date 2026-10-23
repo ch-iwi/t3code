@@ -1,4 +1,5 @@
 // fork(ch-iwi): T3 Connect entry points stay closed without Connect config.
+import { EnvironmentAuthenticatedPrincipal } from "@t3tools/contracts";
 import { RelayClient } from "@t3tools/shared/relayClient";
 import { assert, it } from "@effect/vitest";
 import * as Effect from "effect/Effect";
@@ -36,7 +37,11 @@ it.effect("refuses to sign or store a relay link without Connect config", () =>
   Effect.gen(function* () {
     reached.clear();
     const cloudLink = yield* CloudLink.CloudLink;
-    const proof = yield* Effect.flip(cloudLink.linkProof({} as never, {} as never));
+    const proof = yield* Effect.flip(
+      cloudLink
+        .linkProof({} as never, {} as never)
+        .pipe(Effect.provideService(EnvironmentAuthenticatedPrincipal, {} as never)),
+    );
     const config = yield* Effect.flip(cloudLink.applyRelayConfig({} as never));
     yield* Effect.exit(cloudLink.unlink());
 

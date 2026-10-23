@@ -26,6 +26,8 @@ import { Dv3UsagePolicyLive } from "./dv3UsagePolicy.ts";
 import * as AntigravityUsage from "./provider/Drivers/AntigravityUsage.ts";
 import * as ProviderHostLive from "./provider/ProviderHostLive.ts";
 import * as ServerSettings from "./serverSettings.ts";
+import * as Sqlite from "./persistence/Sqlite.ts";
+import * as CodexUsageHistory from "./usage/CodexUsageHistory.ts";
 import * as UsageService from "./usage/UsageService.ts";
 
 const WINDOW: UsageSummaryInput = {
@@ -82,6 +84,7 @@ const makeService = (home: string, cursorReads: { count: number }) =>
         ),
         Layer.provideMerge(AntigravityUsage.layer),
         Layer.provideMerge(ProviderHostLive.layer),
+        Layer.provideMerge(CodexUsageHistory.layer.pipe(Layer.provideMerge(Sqlite.layerMemory))),
         Layer.provideMerge(Layer.mock(BackgroundPolicy.BackgroundPolicy)({})),
         Layer.provideMerge(Layer.mock(ServerSecretStore.ServerSecretStore)({})),
         Layer.provideMerge(ServerConfig.layerTest(process.cwd(), NodePath.join(home, "state"))),
