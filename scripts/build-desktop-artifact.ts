@@ -3710,7 +3710,9 @@ const buildDesktopArtifactUnlocked = Effect.fn("buildDesktopArtifactUnlocked")(f
 
   if (!options.skipBuild) {
     yield* Effect.log("[desktop-artifact] Building desktop/server/web artifacts...");
-    yield* buildDesktopBundlesUnlocked(repoRoot, appVersion, options.verbose);
+    // fork(ch-iwi): the bundled server and web client keep upstream's version; only the
+    // Electron app carries DV³'s.
+    yield* buildDesktopBundlesUnlocked(repoRoot, serverPackageJson.version, options.verbose);
   }
 
   const requiredBuildInputs = [
