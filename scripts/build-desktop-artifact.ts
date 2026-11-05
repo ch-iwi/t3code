@@ -41,6 +41,8 @@ import { loadRepoEnv } from "./lib/public-config.ts";
 import { assertT3ConnectDisabled } from "./lib/dv3-t3-connect.ts";
 // fork(ch-iwi): DV³ Code's own version number.
 import { resolveDv3BuildVersion } from "./lib/dv3-build-version.ts";
+// fork(ch-iwi): "DV³ Code" in place of "T3 Code" in the shipped text.
+import { rebrandBuiltProductName } from "./lib/dv3-product-name.ts";
 import { selectDesktopRuntimeExternalDependencies } from "./lib/desktop-external-packages.ts";
 import { resolveCatalogDependencies } from "./lib/resolve-catalog.ts";
 
@@ -3746,6 +3748,8 @@ const buildDesktopArtifactUnlocked = Effect.fn("buildDesktopArtifactUnlocked")(f
   const webAssetBrand = resolveDesktopWebAssetBrand(appVersion);
   yield* applyWebBrandAssets(webAssetBrand, "apps/server/dist/client");
   yield* Effect.log(`[desktop-artifact] Applied ${webAssetBrand} web client branding.`);
+  // fork(ch-iwi): rename the product in the desktop, server, and web bundles.
+  yield* rebrandBuiltProductName([distDirs.desktopDist, distDirs.serverDist]);
   yield* validateBundledClientAssets(path.dirname(bundledClientEntry));
 
   yield* fs.makeDirectory(path.join(stageAppDir, "apps/desktop"), { recursive: true });
