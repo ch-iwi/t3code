@@ -1,10 +1,6 @@
-// fork(ch-iwi): keeps the Usage page to providers the DV³ allowlist permits.
-//
-// UsageService reads every built-in driver's history, including a default
-// instance nobody configured, and Cursor's reader calls Cursor's API with a
-// saved login. server.ts provides `Dv3UsagePolicyLive` so blocked drivers'
-// transcripts and accounts are never read. The default allows every driver,
-// which keeps upstream's UsageService tests unchanged.
+// fork(ch-iwi): the Usage page reads only providers the DV³ allowlist permits. Cursor's reader
+// would otherwise call Cursor's API with a saved login. server.ts provides `Dv3UsagePolicyLive`;
+// the default allows every driver so upstream's UsageService tests stay unchanged.
 import { isProviderDriverAllowed } from "@t3tools/contracts";
 import * as Context from "effect/Context";
 import * as Layer from "effect/Layer";

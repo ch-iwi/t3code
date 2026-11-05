@@ -1,9 +1,6 @@
-// DV³ Code versions its desktop app independently of upstream. `dv3-version.json`
-// holds the version being worked towards, and `node scripts/dv3-version.ts`
-// bumps it. Release builds (DV3_RELEASE=true) carry that version as is. Every
-// other build is a prerelease of it, shaped like upstream's nightlies:
-// `<version>-dv3.<commit date>.<commit count>`. Both parts come from HEAD, so a
-// commit builds to the same version on CI and locally.
+// DV³ Code versions its desktop app from `dv3-version.json`, not upstream's version.
+// Release builds (DV3_RELEASE=true) use it as is; others are `<version>-dv3.<date>.<count>`,
+// with date and count taken from HEAD so CI and local builds of a commit agree.
 import * as Config from "effect/Config";
 import * as DateTime from "effect/DateTime";
 import * as Effect from "effect/Effect";

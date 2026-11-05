@@ -6,10 +6,7 @@
 import type { ProviderInstanceConfig } from "./providerInstance.ts";
 
 /** Provider drivers this build may run: Claude, and the ACP Registry (limited below). */
-export const ALLOWED_PROVIDER_DRIVERS: ReadonlySet<string> = new Set([
-  "claudeAgent",
-  "acpRegistry",
-]);
+const ALLOWED_PROVIDER_DRIVERS: ReadonlySet<string> = new Set(["claudeAgent", "acpRegistry"]);
 
 /** ACP Registry agent ids that may be listed, installed, or launched. */
 export const ALLOWED_ACP_REGISTRY_AGENTS: ReadonlySet<string> = new Set([

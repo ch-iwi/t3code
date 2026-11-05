@@ -1,4 +1,5 @@
 // fork(ch-iwi): DV³ Code sends no usage data unless T3CODE_TELEMETRY_ENABLED=true.
+import * as NodeCrypto from "@effect/platform-node/NodeCrypto";
 import * as NodeHttpServer from "@effect/platform-node/NodeHttpServer";
 import * as NodeServices from "@effect/platform-node/NodeServices";
 import { assert, it } from "@effect/vitest";
@@ -11,6 +12,7 @@ import * as HttpServerResponse from "effect/http/HttpServerResponse";
 import * as HostProcess from "@t3tools/shared/HostProcess";
 
 import * as ServerConfig from "./config.ts";
+import * as ManagedPolicy from "./policy/ManagedPolicy.ts";
 import * as AnalyticsService from "./telemetry/AnalyticsService.ts";
 
 const recordAndFlush = (env: Record<string, unknown>) =>
@@ -40,6 +42,7 @@ const recordAndFlush = (env: Record<string, unknown>) =>
         Layer.mergeAll(
           Layer.succeed(HostProcess.Platform, "darwin"),
           Layer.succeed(HostProcess.Architecture, "arm64"),
+          ManagedPolicy.layerTest(),
         ),
       ),
       Layer.provideMerge(NodeHttpServer.layerTest),
@@ -55,7 +58,7 @@ const recordAndFlush = (env: Record<string, unknown>) =>
     return capturedPaths;
   });
 
-it.layer(NodeServices.layer)("DV³ telemetry default", (it) => {
+it.layer(Layer.mergeAll(NodeServices.layer, NodeCrypto.layer))("DV³ telemetry default", (it) => {
   it.effect("sends nothing when T3CODE_TELEMETRY_ENABLED is unset", () =>
     Effect.gen(function* () {
       assert.deepEqual(yield* recordAndFlush({}), []);

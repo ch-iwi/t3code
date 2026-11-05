@@ -1,3 +1,4 @@
+// @effect-diagnostics effectFnOpportunity:off - these wrappers delegate to upstream services that already open their own spans.
 // fork(ch-iwi): enforces the DV³ Code provider allowlist (packages/contracts/src/dv3ProviderAllowlist.ts).
 //
 // Upstream services stay untouched; server.ts wraps three of them where it
@@ -117,9 +118,9 @@ const isInstanceAllowed = (instance: ProviderInstance) =>
   isProviderDriverAllowed(instance.driverKind);
 
 /** Wraps the provider instance registry so disallowed drivers cannot be resolved. */
-export const withDv3ProviderInstancePolicy = <E, R>(
-  layer: Layer.Layer<ProviderInstanceRegistry, E, R>,
-): Layer.Layer<ProviderInstanceRegistry, E, R> =>
+export const withDv3ProviderInstancePolicy = <A, E, R>(
+  layer: Layer.Layer<A | ProviderInstanceRegistry, E, R>,
+): Layer.Layer<A | ProviderInstanceRegistry, E, R> =>
   Layer.effect(
     ProviderInstanceRegistry,
     Effect.gen(function* () {
@@ -144,7 +145,8 @@ export const withDv3ProviderInstancePolicy = <E, R>(
         ),
       });
     }),
-  ).pipe(Layer.provide(layer));
+    // provideMerge keeps the layer's other services (the registry mutator); ours wins for the registry.
+  ).pipe(Layer.provideMerge(layer));
 
 const blockedAgentError = (agentId: string) =>
   new AcpRegistryError({
@@ -229,6 +231,7 @@ export const Dv3CodexInstallationDisabledLive = Layer.effect(
       managedDirectory: path.join(config.baseDir, "tools", "codex"),
       resolve: () => blocked("resolve"),
       acquire: () => blocked("acquire"),
+      compatibility: () => Effect.undefined,
       start: blocked("start"),
       cancel: () => blocked("cancel"),
       state: Effect.succeed(idle),

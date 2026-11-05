@@ -6,7 +6,7 @@
 > **This repository is DV³ Code**, a fork of [T3 Code](https://github.com/pingdotgg/t3code) that pulls upstream updates regularly. The rest of this README is upstream's. How DV³ Code differs:
 >
 > - **Name and icons.** The app is called DV³ Code and uses the DV³ icon on desktop and web. The mobile app is unchanged.
-> - **Installs next to T3 Code.** The desktop app keeps its data in `~/.dv3` instead of `~/.t3` and has its own app ID, so both apps can be installed side by side. The `t3` command-line tool is upstream's and still uses `~/.t3`. Settings → General → dv3 command installs DV³ Code's own command-line tool as `dv3`, so it never replaces T3 Code's `t3`.
+> - **Installs next to T3 Code.** The desktop app keeps its data in `~/.dv3` instead of `~/.t3` and has its own app ID, so both apps can be installed side by side. The `t3` command-line tool is upstream's and still uses `~/.t3`. Settings → About → dv3 command installs DV³ Code's own command-line tool as `dv3`, so it never replaces T3 Code's `t3`.
 > - **Approved agents only.** A DV³ server runs only Claude and the ACP Registry agents Claude (ACP), Junie, and GitHub Copilot CLI. Codex, Cursor, Grok Build, OpenCode, Antigravity, and other registry agents are blocked, and the Usage page doesn't read their history. A DV³ client connected to a stock T3 Code server is not restricted.
 > - **No T3 Connect.** Signing in to T3's hosted account and routing through T3's relay are turned off. Remote access over your local network or Tailscale still works.
 > - **No SSH setup.** The desktop app can't set up a server on another machine over SSH, because that would install upstream's T3 Code there. Start the server on that machine yourself and pair it by link. For the same reason, a DV³ server never downloads a `t3` release: remote server updates, `t3 update`, and `t3 service install` are turned off.
@@ -17,7 +17,7 @@
 
 T3 Code is an "agent harness control surface". It enables control of the agents on your machine with a best-in-class mobile app ([iOS](https://apps.apple.com/us/app/t3-code-remote-claude-more/id6787819824), [Android](https://play.google.com/store/apps/details?id=com.t3tools.t3code)), [web app](https://app.t3.codes) and [Electron-based desktop app](https://t3.codes).
 
-Works with your subscriptions on Claude Code, Codex, Cursor, Grok Build, OpenCode, and Google Antigravity. If they're set up on your computer, T3 Code can control them.
+Works with your subscriptions on Claude Code, Codex, Cursor, Grok Build, OpenCode, Google Antigravity, and fx. If they're set up on your computer, T3 Code can control them.
 
 ## "Wait, what are you selling me?"
 
@@ -28,7 +28,7 @@ We wanted something performant, remote-ready, and truly open. If we ever go the 
 ## Installation
 
 > [!WARNING]
-> T3 Code currently supports Codex, Claude, Cursor, Grok Build, OpenCode, and Antigravity. Install and authenticate at least one provider before use:
+> T3 Code currently supports Codex, Claude, Cursor, Grok Build, OpenCode, Antigravity, and fx. Install and authenticate at least one provider before use:
 >
 > - Codex: install [Codex CLI](https://developers.openai.com/codex/cli) and run `codex login`
 > - Claude: install [Claude Code](https://claude.com/product/claude-code) and run `claude auth login`
@@ -36,6 +36,7 @@ We wanted something performant, remote-ready, and truly open. If we ever go the 
 > - Grok Build: install [Grok Build CLI](https://x.ai/cli) and run `grok login`
 > - OpenCode: install [OpenCode](https://opencode.ai) and run `opencode auth login`
 > - Antigravity: enable it in Settings, then use **Install Antigravity** and **Sign in with Google**. No CLI is required.
+> - fx: install [fx](https://fx.sh) and run `fx login` on the machine running the T3 Code server ([setup guide](./docs/user/providers-fx.md))
 
 ### Command line
 
@@ -99,6 +100,16 @@ yay -S t3code-nightly-bin
 
 The AUR packaging is maintained in this repository under [`packaging/aur`](./packaging/aur).
 
+#### Nix (nixpkgs)
+
+```bash
+nix profile add github:NixOS/nixpkgs/nixos-unstable#t3code
+```
+
+The package is maintained in [nixpkgs](https://github.com/NixOS/nixpkgs/tree/nixos-unstable/pkgs/by-name/t3/t3code)
+and includes the desktop app (`t3code-desktop`) and the `t3` command.
+See [Nix installation](./docs/user/install.md#nix-nixpkgs) for NixOS configuration and updates.
+
 ## Some notes
 
 We are very very early in this project. Expect bugs.
@@ -109,6 +120,7 @@ We are (mostly) not accepting contributions yet. Small fixes may be considered. 
 
 Full docs live in [docs/](./docs). There's no docs site yet.
 
+- [FAQ](./docs/user/faq.md)
 - [Install and first run](./docs/user/install.md)
 - [Permission modes](./docs/user/permission-modes.md)
 - [Keyboard shortcuts](./docs/user/keybindings.md)

@@ -1,8 +1,6 @@
-// fork(ch-iwi): renders the DV³ Code icons in assets/dv3 from assets/dv3/logo.png.
-// Production sits on the DV³ navy; nightly and development reuse upstream's channel backgrounds
-// (night sky, blueprint) so builds stay distinguishable. Upstream's icon pipeline
-// (export-brand-icons.ts) is left untouched so it never overwrites these.
-// Run with `node scripts/export-dv3-icons.ts` after changing the logo or colours.
+// fork(ch-iwi): renders the DV³ icons in assets/dv3 from assets/dv3/logo.png; run after changing it.
+// Nightly and development reuse upstream's channel backgrounds so builds stay distinguishable.
+// Upstream's export-brand-icons.ts is left untouched so it never overwrites these.
 import * as NodeRuntime from "@effect/platform-node/NodeRuntime";
 import * as NodeServices from "@effect/platform-node/NodeServices";
 import * as Console from "effect/Console";

@@ -1,9 +1,6 @@
-// fork(ch-iwi): DV³ Code does not launch servers over SSH.
-//
-// Upstream's SSH setup has the remote host download the `t3` release archive for
-// this app's version from pingdotgg/t3code, which would run upstream T3 Code there
-// (no provider allowlist, telemetry on). The fork publishes no such archives, so
-// setup is refused; a server started on the host can still be paired by link.
+// fork(ch-iwi): upstream's SSH setup downloads the `t3` release from pingdotgg/t3code onto the
+// host, which would run upstream T3 Code there without the allowlist. Setup is refused; a server
+// started on the host can still be paired by link.
 import { SshLaunchError } from "@t3tools/ssh/errors";
 import * as Effect from "effect/Effect";
 import * as Layer from "effect/Layer";
@@ -23,8 +20,9 @@ export const withDv3SshPolicy = <E, R>(
       const inner = yield* DesktopSshEnvironment;
       return DesktopSshEnvironment.of({
         ...inner,
-        ensureEnvironment: () =>
-          Effect.fail(new SshLaunchError({ message: DV3_SSH_DISABLED_MESSAGE, stdout: "" })),
+        ensureEnvironment: Effect.fn("DesktopSshEnvironment.ensureEnvironment")(function* () {
+          return yield* new SshLaunchError({ message: DV3_SSH_DISABLED_MESSAGE, stdout: "" });
+        }),
       });
     }),
   ).pipe(Layer.provide(layer));

@@ -1,3 +1,4 @@
+// @effect-diagnostics effectFnOpportunity:off - these wrappers delegate to upstream services that already open their own spans.
 // fork(ch-iwi): T3 Connect stays off unless this server carries Connect config.
 //
 // The desktop build ships without a relay URL or Clerk keys, so every client hides

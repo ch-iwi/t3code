@@ -4,6 +4,7 @@ import * as NodeFSP from "node:fs/promises";
 import * as NodeOS from "node:os";
 import * as NodePath from "node:path";
 
+import * as NodeCrypto from "@effect/platform-node/NodeCrypto";
 import * as NodeServices from "@effect/platform-node/NodeServices";
 import { assert, it } from "@effect/vitest";
 import {
@@ -14,6 +15,7 @@ import {
 } from "@t3tools/contracts";
 import * as CursorAccountReader from "@t3tools/provider-cursor/server/CursorAccountReader";
 import * as CursorUsageAccounts from "@t3tools/provider-cursor/server/CursorUsageAccounts";
+import { MuseUsageHome } from "@t3tools/provider-muse/server";
 import * as HostProcess from "@t3tools/shared/HostProcess";
 import * as Effect from "effect/Effect";
 import * as Layer from "effect/Layer";
@@ -86,9 +88,12 @@ const makeService = (home: string, cursorReads: { count: number }) =>
         Layer.provideMerge(ProviderHostLive.layer),
         Layer.provideMerge(CodexUsageHistory.layer.pipe(Layer.provideMerge(Sqlite.layerMemory))),
         Layer.provideMerge(Layer.mock(BackgroundPolicy.BackgroundPolicy)({})),
-        Layer.provideMerge(Layer.mock(ServerSecretStore.ServerSecretStore)({})),
+        Layer.provideMerge(
+          Layer.mock(ServerSecretStore.ServerSecretStore)({ get: () => Effect.succeedNone }),
+        ),
         Layer.provideMerge(ServerConfig.layerTest(process.cwd(), NodePath.join(home, "state"))),
-        Layer.provideMerge(NodeServices.layer),
+        Layer.provideMerge(MuseUsageHome.layer),
+        Layer.provideMerge(Layer.mergeAll(NodeServices.layer, NodeCrypto.layer)),
         Layer.provideMerge(Layer.succeed(HostProcess.Platform, "linux")),
         Layer.provideMerge(
           ServerSettings.layerTest({
